@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { ui } from "@/lib/ui";
+import { startFeaturedCheckout } from "./actions";
 
 type Params = Promise<{ id: string }>;
 
@@ -70,13 +71,23 @@ async function JobDetail({ params }: { params: Params }) {
       </div>
 
       {isOwner && (
-        <section className="rounded-md border border-slate-200 bg-slate-50 p-4 text-sm dark:border-slate-700 dark:bg-slate-800">
-          <p className="font-semibold text-slate-900 dark:text-slate-100">Tu oferta</p>
-          <p className="mt-1 text-slate-700 dark:text-slate-300">Estado: {statusLabel}</p>
-          {isFeatured && (
-            <p className="mt-1 text-slate-700 dark:text-slate-300">
-              Destacada hasta el {new Date(job.featured_until!).toLocaleDateString("es-ES")}
-            </p>
+        <section className="space-y-4 rounded-md border border-slate-200 bg-slate-50 p-4 text-sm dark:border-slate-700 dark:bg-slate-800">
+          <div>
+            <p className="font-semibold text-slate-900 dark:text-slate-100">Tu oferta</p>
+            <p className="mt-1 text-slate-700 dark:text-slate-300">Estado: {statusLabel}</p>
+            {isFeatured && (
+              <p className="mt-1 text-slate-700 dark:text-slate-300">
+                Destacada hasta el {new Date(job.featured_until!).toLocaleDateString("es-ES")}
+              </p>
+            )}
+          </div>
+
+          {!isFeatured && job.status === "active" && (
+            <form action={startFeaturedCheckout.bind(null, job.id)}>
+              <button type="submit" className={ui.button}>
+                Destacar oferta por 19 zł (7 días)
+              </button>
+            </form>
           )}
         </section>
       )}
