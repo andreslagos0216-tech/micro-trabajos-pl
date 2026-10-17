@@ -17,9 +17,9 @@ export default function Home({ searchParams }: { searchParams: SearchParams }) {
 }
 
 async function JobsFeed({ searchParams }: { searchParams: SearchParams }) {
+  await connection();
   const { q, city } = await searchParams;
   const supabase = await createClient();
-  await connection();
   const now = new Date().toISOString();
 
   const { data: cities } = await supabase
@@ -129,5 +129,7 @@ function JobCard({ job, featured = false }: { job: Job; featured?: boolean }) {
     </li>
   );
 }
+
+
 
 
