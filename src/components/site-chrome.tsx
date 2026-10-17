@@ -7,10 +7,11 @@ function LangSwitcher({ current }: { current: Lang }) {
   return (
     <div className="flex gap-1" aria-label="Idioma / Język / Language">
       {langs.map((l) => (
-        <Link
+        // Enlace normal: fuerza una carga completa y respeta la cookie nueva
+        // eslint-disable-next-line @next/next/no-html-link-for-pages
+        <a
           key={l}
           href={`/api/lang?l=${l}`}
-          prefetch={false}
           aria-current={l === current ? "true" : undefined}
           className={`rounded px-2 py-1 text-xs font-semibold ${
             l === current
@@ -19,7 +20,7 @@ function LangSwitcher({ current }: { current: Lang }) {
           }`}
         >
           {l.toUpperCase()}
-        </Link>
+        </a>
       ))}
     </div>
   );
