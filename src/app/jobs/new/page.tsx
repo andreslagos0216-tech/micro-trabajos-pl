@@ -2,21 +2,15 @@
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { ui } from "@/lib/ui";
 import { createJob } from "./actions";
-
-const inputClass =
-  "w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10";
-
-const labelClass = "mb-1 block text-sm font-medium text-gray-800";
 
 export default function NewJobPage() {
   return (
-    <main className="mx-auto max-w-xl p-6">
-      <h1 className="mb-2 text-2xl font-bold">Publicar oferta</h1>
-      <p className="mb-6 text-sm text-gray-600">
-        Completa los datos. La oferta aparecerá en el listado al publicarla.
-      </p>
-      <Suspense fallback={<p className="text-gray-600">Cargando formulario...</p>}>
+    <main className={ui.container}>
+      <h1 className={ui.title}>Publicar oferta</h1>
+      <p className={`mb-6 ${ui.subtitle}`}>Completa los datos. La oferta se publica al enviar el formulario.</p>
+      <Suspense fallback={<p className={ui.muted}>Cargando formulario...</p>}>
         <JobForm />
       </Suspense>
     </main>
@@ -38,31 +32,30 @@ async function JobForm() {
   ]);
 
   return (
-    <form action={createJob} className="space-y-5 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+    <form action={createJob} className={`${ui.card} space-y-5`}>
       <div>
-        <label htmlFor="title" className={labelClass}>Título</label>
-        <input id="title" name="title" required minLength={5} maxLength={120} placeholder="Ej.: Limpieza de piso de 60 m²" className={inputClass} />
+        <label htmlFor="title" className={ui.label}>Título</label>
+        <input id="title" name="title" required minLength={5} maxLength={120} placeholder="Ej.: Limpieza de piso de 60 m²" className={ui.input} />
       </div>
 
       <div>
-        <label htmlFor="description" className={labelClass}>Descripción</label>
-        <textarea id="description" name="description" required maxLength={5000} rows={5} placeholder="Describe el trabajo, horario y requisitos" className={inputClass} />
+        <label htmlFor="description" className={ui.label}>Descripción</label>
+        <textarea id="description" name="description" required maxLength={5000} rows={5} placeholder="Describe el trabajo, horario y requisitos" className={ui.input} />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="city_id" className={labelClass}>Ciudad</label>
-          <select id="city_id" name="city_id" required defaultValue="" className={inputClass}>
+          <label htmlFor="city_id" className={ui.label}>Ciudad</label>
+          <select id="city_id" name="city_id" required defaultValue="" className={ui.input}>
             <option value="" disabled>Selecciona una ciudad</option>
             {cities?.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </select>
         </div>
-
         <div>
-          <label htmlFor="category_id" className={labelClass}>Categoría</label>
-          <select id="category_id" name="category_id" required defaultValue="" className={inputClass}>
+          <label htmlFor="category_id" className={ui.label}>Categoría</label>
+          <select id="category_id" name="category_id" required defaultValue="" className={ui.input}>
             <option value="" disabled>Selecciona una categoría</option>
             {categories?.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
@@ -73,26 +66,26 @@ async function JobForm() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="pay_type" className={labelClass}>Tipo de pago</label>
-          <select id="pay_type" name="pay_type" required defaultValue="hour" className={inputClass}>
+          <label htmlFor="pay_type" className={ui.label}>Tipo de pago</label>
+          <select id="pay_type" name="pay_type" required defaultValue="hour" className={ui.input}>
             <option value="hour">Por hora</option>
             <option value="project">Por proyecto</option>
           </select>
         </div>
-
         <div>
-          <label htmlFor="pay_pln" className={labelClass}>Tarifa (zł / PLN)</label>
+          <label htmlFor="pay_pln" className={ui.label}>Tarifa</label>
           <div className="relative">
-            <input id="pay_pln" name="pay_pln" type="number" step="0.01" min="1" required placeholder="0.00" className={`${inputClass} pr-12`} />
-            <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm font-medium text-gray-500">zł</span>
+            <input id="pay_pln" name="pay_pln" type="number" step="0.01" min="1" required placeholder="0.00" className={`${ui.input} pr-12`} />
+            <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm font-semibold text-slate-600 dark:text-slate-300">zł</span>
           </div>
-          <p className="mt-1 text-xs text-gray-500">Cantidad en złotych polacos, por hora o por proyecto según el tipo elegido.</p>
+          <p className={`mt-1.5 text-xs ${ui.muted}`}>Importe en złotych (PLN), por hora o por proyecto según el tipo elegido.</p>
         </div>
       </div>
 
-      <button type="submit" className="w-full rounded-md bg-black px-4 py-3 text-base font-semibold text-white shadow hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
-        Publicar oferta
-      </button>
+      <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+        <a href="/" className={ui.buttonSecondary}>Cancelar</a>
+        <button type="submit" className={ui.button}>Publicar oferta</button>
+      </div>
     </form>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { ui } from "@/lib/ui";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -22,35 +23,40 @@ export default function LoginPage() {
 
   if (status === "sent") {
     return (
-      <main className="mx-auto max-w-sm p-6">
-        <h1 className="mb-4 text-2xl font-bold">Revisa tu correo</h1>
-        <p className="text-gray-600">
-          Te hemos enviado un enlace para entrar a {email}. Ábrelo desde este mismo navegador.
+      <main className={`${ui.container} max-w-md`}>
+        <h1 className={ui.title}>Revisa tu correo</h1>
+        <p className={`mt-4 ${ui.card} text-sm text-slate-700 dark:text-slate-300`}>
+          Enviamos un enlace de acceso a <strong className="text-slate-900 dark:text-slate-100">{email}</strong>. Ábrelo desde este mismo navegador.
         </p>
       </main>
     );
   }
 
   return (
-    <main className="mx-auto max-w-sm p-6">
-      <h1 className="mb-4 text-2xl font-bold">Iniciar sesión</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="tu@correo.com"
-          required
-          className="w-full rounded border px-3 py-2"
-        />
-        <button
-          disabled={status === "sending"}
-          className="w-full rounded bg-black py-2 text-white disabled:opacity-50"
-        >
-          {status === "sending" ? "Enviando..." : "Enviar enlace mágico"}
+    <main className={`${ui.container} max-w-md`}>
+      <h1 className={ui.title}>Iniciar sesión</h1>
+      <p className={`mb-6 ${ui.subtitle}`}>Te enviaremos un enlace al correo. No necesitas contraseña.</p>
+
+      <form onSubmit={handleSubmit} className={`${ui.card} space-y-4`}>
+        <div>
+          <label htmlFor="email" className={ui.label}>Correo electrónico</label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="tu@correo.com"
+            required
+            className={ui.input}
+          />
+        </div>
+
+        <button type="submit" disabled={status === "sending"} className={`${ui.button} w-full`}>
+          {status === "sending" ? "Enviando..." : "Enviar enlace de acceso"}
         </button>
+
         {status === "error" && (
-          <p className="text-red-600">No se pudo enviar el enlace. Inténtalo de nuevo.</p>
+          <p className={ui.errorBox}>No se pudo enviar el enlace. Revisa el correo e inténtalo de nuevo.</p>
         )}
       </form>
     </main>
