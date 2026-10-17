@@ -3,13 +3,17 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { dict, getLang, type Dict } from "@/lib/i18n";
+import { kindDict, type Kind } from "@/lib/i18n-kinds";
+import { localizeMany } from "@/lib/translate";
 import { ui } from "@/lib/ui";
 
-type SearchParams = Promise<{ q?: string; city?: string }>;
+type SearchParams = Promise<{ q?: string; city?: string; k?: string }>;
+
+const KIND_LIST: Kind[] = ["job", "candidate", "service"];
 
 export default function Home({ searchParams }: { searchParams: SearchParams }) {
   return (
-    <Suspense fallback={<main className={ui.container}><p className={ui.muted}>Loading...</p></main>}>
+    <Suspense fallback={null}>
       <HomeContent searchParams={searchParams} />
     </Suspense>
   );
@@ -19,7 +23,10 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   await connection();
   const lang = await getLang();
   const t = dict[lang];
-  const { q, city } = await searchParams;
+  const k = kindDict[lang];
+  const { q, city, k: kindParam } = await searchParams;
+  const kind = KIND_LIST.includes(kindParam as Kind) ? (kindParam as Kind) : null;
+
   const supabase = await createClient();
   const now = new Date().toISOString();
 
@@ -28,22 +35,26 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   const buildQuery = () => {
     let query = supabase
       .from("job_posts")
-      .select("id, title, pay_pln, pay_type, featured_until, cities(name)")
+      .select("id, title, description, pay_pln, pay_type, kind, original_lang, featured_until, cities(name)")
       .eq("status", "active");
+    if (kind) query = query.eq("kind", kind);
     if (q) query = query.ilike("title", `%${q}%`);
     if (city) query = query.eq("city_id", Number(city));
     return query;
   };
 
-  const { data: featuredJobs } = await buildQuery()
+  const { data: featuredRows } = await buildQuery()
     .gt("featured_until", now)
     .order("featured_until", { ascending: false })
     .limit(5);
 
-  const { data: jobs, error } = await buildQuery()
+  const { data: rows, error } = await buildQuery()
     .or(`featured_until.is.null,featured_until.lte.${now}`)
     .order("bumped_at", { ascending: false })
     .limit(30);
+
+  const featuredJobs = await localizeMany(featuredRows ?? [], lang);
+  const jobs = await localizeMany(rows ?? [], lang);
 
   return (
     <main className={ui.container}>
@@ -52,14 +63,30 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
         <p className={`mt-2 max-w-2xl ${ui.subtitle}`}>{t.heroSubtitle}</p>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          <PathCard href="#ofertas" title={t.cardWorkTitle} text={t.cardWorkText} />
-          <PathCard href="/jobs/new" title={t.cardHireTitle} text={t.cardHireText} />
-          <PathCard href="/jobs/new" title={t.cardServiceTitle} text={t.cardServiceText} />
+          <PathCard href="/jobs/new?kind=candidate" title={k.candidate.label} text={t.cardWorkText} />
+          <PathCard href="/jobs/new?kind=job" title={k.job.label} text={t.cardHireText} />
+          <PathCard href="/jobs/new?kind=service" title={k.service.label} text={t.cardServiceText} />
         </div>
       </section>
 
       <div id="ofertas" className="scroll-mt-6">
+        <nav className="mb-6 flex flex-wrap gap-2" aria-label="Tipo de anuncio">
+          {(["all", ...KIND_LIST] as const).map((item) => {
+            const active = item === "all" ? !kind : item === kind;
+            return (
+              <Link
+                key={item}
+                href={item === "all" ? "/#ofertas" : `/?k=${item}#ofertas`}
+                className={active ? ui.button : ui.buttonSecondary}
+              >
+                {item === "all" ? k.all : k[item].label}
+              </Link>
+            );
+          })}
+        </nav>
+
         <form className="mb-10 grid gap-3 sm:grid-cols-[1fr_200px_auto]">
+          {kind && <input type="hidden" name="k" value={kind} />}
           <div>
             <label htmlFor="q" className="sr-only">{t.searchLabel}</label>
             <input id="q" name="q" defaultValue={q} placeholder={t.searchPlaceholder} className={ui.input} />
@@ -78,12 +105,12 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
 
         {error && <p className={ui.errorBox}>{t.loadError}</p>}
 
-        {featuredJobs && featuredJobs.length > 0 && (
+        {featuredJobs.length > 0 && (
           <section className="mb-10">
             <h2 className={ui.sectionTitle}>{t.featured}</h2>
             <ul className="space-y-3">
               {featuredJobs.map((job) => (
-                <JobCard key={job.id} job={job} t={t} featured />
+                <JobCard key={job.id} job={job} t={t} badge={k[job.kind as Kind].badge} featured />
               ))}
             </ul>
           </section>
@@ -91,10 +118,10 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
 
         <section>
           <h2 className={ui.sectionTitle}>{t.recent}</h2>
-          {jobs && jobs.length > 0 ? (
+          {jobs.length > 0 ? (
             <ul className="space-y-3">
               {jobs.map((job) => (
-                <JobCard key={job.id} job={job} t={t} />
+                <JobCard key={job.id} job={job} t={t} badge={k[job.kind as Kind].badge} />
               ))}
             </ul>
           ) : (
@@ -118,7 +145,7 @@ function PathCard({ href, title, text }: { href: string; title: string; text: st
   );
 }
 
-type Job = {
+type JobRow = {
   id: string;
   title: string;
   pay_pln: number;
@@ -126,10 +153,23 @@ type Job = {
   cities: { name: string } | null;
 };
 
-function JobCard({ job, t, featured = false }: { job: Job; t: Dict; featured?: boolean }) {
+function JobCard({
+  job,
+  t,
+  badge,
+  featured = false,
+}: {
+  job: JobRow;
+  t: Dict;
+  badge: string;
+  featured?: boolean;
+}) {
   return (
     <li className={featured ? ui.cardFeatured : ui.card}>
-      {featured && <span className={`${ui.badge} mb-2`}>{t.badgeFeatured}</span>}
+      <div className="mb-2 flex flex-wrap gap-2">
+        <span className={ui.badgeNeutral}>{badge}</span>
+        {featured && <span className={ui.badge}>{t.badgeFeatured}</span>}
+      </div>
       <Link
         href={`/jobs/${job.id}`}
         className="block text-base font-semibold text-slate-900 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded dark:text-slate-50"

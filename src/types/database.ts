@@ -120,6 +120,7 @@ export type Database = {
       job_posts: {
         Row: {
           author_id: string
+          availability: string | null
           bumped_at: string
           category_id: number
           city_id: number
@@ -127,6 +128,9 @@ export type Database = {
           description: string
           featured_until: string | null
           id: string
+          kind: string
+          languages: string[]
+          original_lang: string
           pay_pln: number
           pay_type: string
           status: string
@@ -134,6 +138,7 @@ export type Database = {
         }
         Insert: {
           author_id: string
+          availability?: string | null
           bumped_at?: string
           category_id: number
           city_id: number
@@ -141,6 +146,9 @@ export type Database = {
           description: string
           featured_until?: string | null
           id?: string
+          kind?: string
+          languages?: string[]
+          original_lang?: string
           pay_pln: number
           pay_type: string
           status?: string
@@ -148,6 +156,7 @@ export type Database = {
         }
         Update: {
           author_id?: string
+          availability?: string | null
           bumped_at?: string
           category_id?: number
           city_id?: number
@@ -155,6 +164,9 @@ export type Database = {
           description?: string
           featured_until?: string | null
           id?: string
+          kind?: string
+          languages?: string[]
+          original_lang?: string
           pay_pln?: number
           pay_type?: string
           status?: string
@@ -180,6 +192,41 @@ export type Database = {
             columns: ["city_id"]
             isOneToOne: false
             referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_translations: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          job_id: string
+          lang: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          job_id: string
+          lang: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          job_id?: string
+          lang?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_translations_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "job_posts"
             referencedColumns: ["id"]
           },
         ]

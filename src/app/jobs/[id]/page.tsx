@@ -3,7 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { dict, getLang } from "@/lib/i18n";
+import { dict, getLang, type Lang } from "@/lib/i18n";
+import { kindDict, type Kind } from "@/lib/i18n-kinds";
+import { categoryName } from "@/lib/labels";
+import { localizeJob } from "@/lib/translate";
 import { ui } from "@/lib/ui";
 import { startFeaturedCheckout } from "./actions";
 
@@ -21,7 +24,9 @@ export default function JobPage({ params }: { params: Params }) {
 
 async function JobDetail({ params }: { params: Params }) {
   await connection();
-  const t = dict[await getLang()];
+  const lang = await getLang();
+  const t = dict[lang];
+  const k = kindDict[lang];
   const { id } = await params;
   const supabase = await createClient();
 
@@ -31,16 +36,23 @@ async function JobDetail({ params }: { params: Params }) {
 
   const { data: job } = await supabase
     .from("job_posts")
-    .select("id, title, description, pay_pln, pay_type, status, featured_until, author_id, cities(name), categories(name)")
+    .select("id, title, description, pay_pln, pay_type, status, featured_until, author_id, kind, original_lang, availability, languages, cities(name), categories(name, slug)")
     .eq("id", id)
     .single();
 
   if (!job) notFound();
 
+  const local = await localizeJob(
+    { id: job.id, title: job.title, description: job.description, original_lang: job.original_lang },
+    lang as Lang
+  );
+
   const isOwner = user?.id === job.author_id;
   const isFeatured = !!job.featured_until && new Date(job.featured_until) > new Date();
+  const kind = job.kind as Kind;
   const statusLabel =
     job.status === "active" ? t.statusActive : job.status === "paused" ? t.statusPaused : t.statusClosed;
+  const category = categoryName(job.categories?.slug, lang, job.categories?.name ?? "");
 
   return (
     <>
@@ -48,19 +60,20 @@ async function JobDetail({ params }: { params: Params }) {
 
       <article className={`${ui.card} space-y-6`}>
         <div className="flex flex-wrap items-center gap-2">
+          <span className={ui.badgeNeutral}>{k[kind].badge}</span>
           {isFeatured && <span className={ui.badge}>{t.badgeFeatured}</span>}
-          <span className={ui.badgeNeutral}>{job.categories?.name}</span>
+          <span className={ui.badgeNeutral}>{category}</span>
         </div>
 
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">{job.title}</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">{local.title}</h1>
           <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
             <div>
               <dt className={ui.muted}>{t.cityLabel}</dt>
               <dd className="font-medium text-slate-900 dark:text-slate-100">{job.cities?.name}</dd>
             </div>
             <div>
-              <dt className={ui.muted}>{t.payLabel}</dt>
+              <dt className={ui.muted}>{k[kind].rateLabel}</dt>
               <dd className="font-medium text-slate-900 dark:text-slate-100">{job.pay_pln} zł</dd>
             </div>
             <div>
@@ -69,12 +82,27 @@ async function JobDetail({ params }: { params: Params }) {
                 {job.pay_type === "hour" ? t.payHour : t.payProject}
               </dd>
             </div>
+            {job.availability && (
+              <div>
+                <dt className={ui.muted}>{k.availability}</dt>
+                <dd className="font-medium text-slate-900 dark:text-slate-100">{job.availability}</dd>
+              </div>
+            )}
+            {job.languages && job.languages.length > 0 && (
+              <div>
+                <dt className={ui.muted}>{k.spokenLanguages}</dt>
+                <dd className="font-medium text-slate-900 dark:text-slate-100">
+                  {job.languages.map((l: string) => k.langNames[l as Lang] ?? l).join(", ")}
+                </dd>
+              </div>
+            )}
           </dl>
         </div>
 
         <div>
-          <h2 className={ui.sectionTitle}>{t.descriptionTitle}</h2>
-          <p className="whitespace-pre-line text-sm leading-relaxed text-slate-800 dark:text-slate-200">{job.description}</p>
+          <h2 className={ui.sectionTitle}>{k[kind].descLabel}</h2>
+          <p className="whitespace-pre-line text-sm leading-relaxed text-slate-800 dark:text-slate-200">{local.description}</p>
+          {local.translated && <p className={`mt-2 text-xs ${ui.muted}`}>{k.autoTranslated}</p>}
         </div>
 
         {isOwner && (
