@@ -1,5 +1,6 @@
 ﻿import { Suspense } from "react";
 import Link from "next/link";
+import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
 type SearchParams = Promise<{ q?: string; city?: string }>;
@@ -18,6 +19,7 @@ export default function Home({ searchParams }: { searchParams: SearchParams }) {
 async function JobsFeed({ searchParams }: { searchParams: SearchParams }) {
   const { q, city } = await searchParams;
   const supabase = await createClient();
+  await connection();
   const now = new Date().toISOString();
 
   const { data: cities } = await supabase
@@ -127,3 +129,5 @@ function JobCard({ job, featured = false }: { job: Job; featured?: boolean }) {
     </li>
   );
 }
+
+
