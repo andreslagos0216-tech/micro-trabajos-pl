@@ -2,31 +2,23 @@
 import Link from "next/link";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { dict, getLang, type Dict } from "@/lib/i18n";
 import { ui } from "@/lib/ui";
 
 type SearchParams = Promise<{ q?: string; city?: string }>;
 
 export default function Home({ searchParams }: { searchParams: SearchParams }) {
   return (
-    <main className={ui.container}>
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className={ui.title}>Ofertas en Polonia</h1>
-          <p className={ui.subtitle}>Trabajos puntuales y por horas publicados por particulares.</p>
-        </div>
-        <Link href="/jobs/new" className={ui.button}>
-          Publicar oferta
-        </Link>
-      </div>
-      <Suspense fallback={<p className={ui.muted}>Cargando ofertas...</p>}>
-        <JobsFeed searchParams={searchParams} />
-      </Suspense>
-    </main>
+    <Suspense fallback={<main className={ui.container}><p className={ui.muted}>Loading...</p></main>}>
+      <HomeContent searchParams={searchParams} />
+    </Suspense>
   );
 }
 
-async function JobsFeed({ searchParams }: { searchParams: SearchParams }) {
+async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   await connection();
+  const lang = await getLang();
+  const t = dict[lang];
   const { q, city } = await searchParams;
   const supabase = await createClient();
   const now = new Date().toISOString();
@@ -53,53 +45,76 @@ async function JobsFeed({ searchParams }: { searchParams: SearchParams }) {
     .order("bumped_at", { ascending: false })
     .limit(30);
 
-  if (error) {
-    return <p className={ui.errorBox}>No se pudieron cargar las ofertas. Inténtalo de nuevo más tarde.</p>;
-  }
-
   return (
-    <>
-      <form className="mb-10 grid gap-3 sm:grid-cols-[1fr_200px_auto]">
-        <div>
-          <label htmlFor="q" className="sr-only">Buscar</label>
-          <input id="q" name="q" defaultValue={q} placeholder="Buscar por título" className={ui.input} />
-        </div>
-        <div>
-          <label htmlFor="city" className="sr-only">Ciudad</label>
-          <select id="city" name="city" defaultValue={city ?? ""} className={ui.input}>
-            <option value="">Todas las ciudades</option>
-            {cities?.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
-        </div>
-        <button type="submit" className={ui.button}>Buscar</button>
-      </form>
+    <main className={ui.container}>
+      <section className="mb-10">
+        <h1 className={ui.title}>{t.heroTitle}</h1>
+        <p className={`mt-2 max-w-2xl ${ui.subtitle}`}>{t.heroSubtitle}</p>
 
-      {featuredJobs && featuredJobs.length > 0 && (
-        <section className="mb-10">
-          <h2 className={ui.sectionTitle}>Destacadas</h2>
-          <ul className="space-y-3">
-            {featuredJobs.map((job) => (
-              <JobCard key={job.id} job={job} featured />
-            ))}
-          </ul>
-        </section>
-      )}
-
-      <section>
-        <h2 className={ui.sectionTitle}>Recientes</h2>
-        {jobs && jobs.length > 0 ? (
-          <ul className="space-y-3">
-            {jobs.map((job) => (
-              <JobCard key={job.id} job={job} />
-            ))}
-          </ul>
-        ) : (
-          <p className={ui.emptyBox}>Todavía no hay ofertas. Publica la primera.</p>
-        )}
+        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <PathCard href="#ofertas" title={t.cardWorkTitle} text={t.cardWorkText} />
+          <PathCard href="/jobs/new" title={t.cardHireTitle} text={t.cardHireText} />
+          <PathCard href="/jobs/new" title={t.cardServiceTitle} text={t.cardServiceText} />
+        </div>
       </section>
-    </>
+
+      <div id="ofertas" className="scroll-mt-6">
+        <form className="mb-10 grid gap-3 sm:grid-cols-[1fr_200px_auto]">
+          <div>
+            <label htmlFor="q" className="sr-only">{t.searchLabel}</label>
+            <input id="q" name="q" defaultValue={q} placeholder={t.searchPlaceholder} className={ui.input} />
+          </div>
+          <div>
+            <label htmlFor="city" className="sr-only">{t.cityLabel}</label>
+            <select id="city" name="city" defaultValue={city ?? ""} className={ui.input}>
+              <option value="">{t.allCities}</option>
+              {cities?.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          </div>
+          <button type="submit" className={ui.button}>{t.searchButton}</button>
+        </form>
+
+        {error && <p className={ui.errorBox}>{t.loadError}</p>}
+
+        {featuredJobs && featuredJobs.length > 0 && (
+          <section className="mb-10">
+            <h2 className={ui.sectionTitle}>{t.featured}</h2>
+            <ul className="space-y-3">
+              {featuredJobs.map((job) => (
+                <JobCard key={job.id} job={job} t={t} featured />
+              ))}
+            </ul>
+          </section>
+        )}
+
+        <section>
+          <h2 className={ui.sectionTitle}>{t.recent}</h2>
+          {jobs && jobs.length > 0 ? (
+            <ul className="space-y-3">
+              {jobs.map((job) => (
+                <JobCard key={job.id} job={job} t={t} />
+              ))}
+            </ul>
+          ) : (
+            <p className={ui.emptyBox}>{t.empty}</p>
+          )}
+        </section>
+      </div>
+    </main>
+  );
+}
+
+function PathCard({ href, title, text }: { href: string; title: string; text: string }) {
+  return (
+    <Link
+      href={href}
+      className="block rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-blue-400"
+    >
+      <h3 className="font-semibold text-slate-900 dark:text-slate-50">{title}</h3>
+      <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{text}</p>
+    </Link>
   );
 }
 
@@ -111,10 +126,10 @@ type Job = {
   cities: { name: string } | null;
 };
 
-function JobCard({ job, featured = false }: { job: Job; featured?: boolean }) {
+function JobCard({ job, t, featured = false }: { job: Job; t: Dict; featured?: boolean }) {
   return (
     <li className={featured ? ui.cardFeatured : ui.card}>
-      {featured && <span className={`${ui.badge} mb-2`}>Destacada</span>}
+      {featured && <span className={`${ui.badge} mb-2`}>{t.badgeFeatured}</span>}
       <Link
         href={`/jobs/${job.id}`}
         className="block text-base font-semibold text-slate-900 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded dark:text-slate-50"
@@ -122,7 +137,7 @@ function JobCard({ job, featured = false }: { job: Job; featured?: boolean }) {
         {job.title}
       </Link>
       <p className={`mt-1 ${ui.muted}`}>
-        {job.cities?.name} · {job.pay_pln} zł / {job.pay_type === "hour" ? "hora" : "proyecto"}
+        {job.cities?.name} · {job.pay_pln} zł / {job.pay_type === "hour" ? t.perHour : t.perProject}
       </p>
     </li>
   );
