@@ -1,11 +1,21 @@
-﻿import Link from "next/link";
+﻿import { Suspense } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
-type Props = {
-  searchParams: Promise<{ q?: string; city?: string }>;
-};
+type SearchParams = Promise<{ q?: string; city?: string }>;
 
-export default async function Home({ searchParams }: Props) {
+export default function Home({ searchParams }: { searchParams: SearchParams }) {
+  return (
+    <main className="mx-auto max-w-3xl p-6">
+      <h1 className="mb-6 text-3xl font-bold">Ofertas en Polonia</h1>
+      <Suspense fallback={<p className="text-gray-600">Cargando ofertas...</p>}>
+        <JobsFeed searchParams={searchParams} />
+      </Suspense>
+    </main>
+  );
+}
+
+async function JobsFeed({ searchParams }: { searchParams: SearchParams }) {
   const { q, city } = await searchParams;
   const supabase = await createClient();
   const now = new Date().toISOString();
@@ -15,7 +25,6 @@ export default async function Home({ searchParams }: Props) {
     .select("id, name")
     .order("name");
 
-  // Consulta base con los filtros de búsqueda y ciudad
   const buildQuery = () => {
     let query = supabase
       .from("job_posts")
@@ -38,13 +47,11 @@ export default async function Home({ searchParams }: Props) {
     .limit(30);
 
   if (error) {
-    return <p className="p-6">No se pudieron cargar las ofertas.</p>;
+    return <p className="text-red-600">No se pudieron cargar las ofertas.</p>;
   }
 
   return (
-    <main className="mx-auto max-w-3xl p-6">
-      <h1 className="mb-6 text-3xl font-bold">Ofertas en Polonia</h1>
-
+    <>
       <form className="mb-6 flex flex-col gap-2 sm:flex-row">
         <input
           name="q"
@@ -90,7 +97,7 @@ export default async function Home({ searchParams }: Props) {
           <p className="text-gray-600">Todavía no hay ofertas. Publica la primera.</p>
         )}
       </section>
-    </main>
+    </>
   );
 }
 
@@ -104,9 +111,7 @@ type Job = {
 
 function JobCard({ job, featured = false }: { job: Job; featured?: boolean }) {
   return (
-    <li
-      className={`rounded border p-4 ${featured ? "border-yellow-400 bg-yellow-50" : ""}`}
-    >
+    <li className={`rounded border p-4 ${featured ? "border-yellow-400 bg-yellow-50" : ""}`}>
       {featured && (
         <span className="mb-1 inline-block rounded bg-yellow-200 px-2 py-0.5 text-xs font-semibold">
           Destacada
