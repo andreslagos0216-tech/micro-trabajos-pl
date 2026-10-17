@@ -7,27 +7,32 @@ import { dict, getLang, type Lang } from "@/lib/i18n";
 import { kindDict, type Kind } from "@/lib/i18n-kinds";
 import { categoryName } from "@/lib/labels";
 import { localizeJob } from "@/lib/translate";
+import { reportText } from "@/lib/report-i18n";
 import { ui } from "@/lib/ui";
+import { ReportForm } from "@/components/report-form";
 import { startFeaturedCheckout } from "./actions";
 
 type Params = Promise<{ id: string }>;
+type SearchParams = Promise<{ reported?: string }>;
 
-export default function JobPage({ params }: { params: Params }) {
+export default function JobPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
   return (
     <main className={ui.container}>
       <Suspense fallback={null}>
-        <JobDetail params={params} />
+        <JobDetail params={params} searchParams={searchParams} />
       </Suspense>
     </main>
   );
 }
 
-async function JobDetail({ params }: { params: Params }) {
+async function JobDetail({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
   await connection();
   const lang = await getLang();
   const t = dict[lang];
   const k = kindDict[lang];
+  const r = reportText[lang];
   const { id } = await params;
+  const { reported } = await searchParams;
   const supabase = await createClient();
 
   const {
@@ -57,6 +62,17 @@ async function JobDetail({ params }: { params: Params }) {
   return (
     <>
       <Link href="/" className={`${ui.link} mb-6 inline-block`}>{t.backToList}</Link>
+
+      {reported === "ok" && (
+        <p className="mb-4 rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-200">
+          {r.thanks}
+        </p>
+      )}
+      {reported === "dup" && (
+        <p className="mb-4 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-200">
+          {r.duplicate}
+        </p>
+      )}
 
       <article className={`${ui.card} space-y-6`}>
         <div className="flex flex-wrap items-center gap-2">
@@ -125,6 +141,18 @@ async function JobDetail({ params }: { params: Params }) {
           </section>
         )}
       </article>
+
+      {!isOwner && (
+        <div className="mt-6">
+          {user ? (
+            <ReportForm jobId={job.id} lang={lang} />
+          ) : (
+            <p className="text-sm">
+              <Link href="/login" className={ui.link}>{r.loginFirst}</Link>
+            </p>
+          )}
+        </div>
+      )}
     </>
   );
 }
