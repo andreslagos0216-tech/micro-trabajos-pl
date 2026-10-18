@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
+import { createClient } from "@/lib/supabase/server";
 import { dict, getLang, type Lang } from "@/lib/i18n";
 import { geoText } from "@/lib/i18n-geo";
+import { profileText } from "@/lib/profile-i18n";
 
 const attribution: Record<Lang, string> = {
   pl: "Dane o miejscowościach: GeoNames (CC BY 4.0)",
@@ -14,7 +16,6 @@ function LangSwitcher({ current }: { current: Lang }) {
   return (
     <div className="flex gap-1" aria-label="Idioma / Język / Language">
       {langs.map((l) => (
-        // Enlace normal: fuerza una carga completa y respeta la cookie nueva
         // eslint-disable-next-line @next/next/no-html-link-for-pages
         <a
           key={l}
@@ -32,11 +33,16 @@ function LangSwitcher({ current }: { current: Lang }) {
     </div>
   );
 }
-
 export async function SiteHeader() {
   const lang = await getLang();
   const t = dict[lang];
   const g = geoText[lang];
+  const p = profileText[lang];
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
@@ -48,7 +54,9 @@ export async function SiteHeader() {
           <Link href="/listados/rent" className="hover:text-blue-700 dark:hover:text-blue-400">{t.navRent}</Link>
           <Link href="/mapa" className="hover:text-blue-700 dark:hover:text-blue-400">{g.navMap}</Link>
           <Link href="/jobs/new" className="hover:text-blue-700 dark:hover:text-blue-400">{t.navPublish}</Link>
-          <Link href="/login" className="hover:text-blue-700 dark:hover:text-blue-400">{t.navLogin}</Link>
+          <Link href={user ? "/perfil" : "/login"} className="hover:text-blue-700 dark:hover:text-blue-400">
+            {user ? p.navProfile : t.navLogin}
+          </Link>
           <LangSwitcher current={lang} />
         </nav>
       </div>
