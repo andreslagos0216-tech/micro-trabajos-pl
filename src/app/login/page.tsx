@@ -1,26 +1,38 @@
-﻿import { Suspense } from "react";
+import { Suspense } from "react";
 import { connection } from "next/server";
-import { dict, getLang } from "@/lib/i18n";
+import { getLang } from "@/lib/i18n";
 import { ui } from "@/lib/ui";
-import { LoginForm } from "@/components/login-form";
+import { LoginTabs } from "@/components/login-tabs";
 
-export default function LoginPage() {
+type SearchParams = Promise<{
+  tab?: string;
+  error?: string;
+  check?: string;
+  reset?: string;
+}>;
+
+export default function LoginPage({ searchParams }: { searchParams: SearchParams }) {
   return (
-    <Suspense fallback={null}>
-      <LoginContent />
-    </Suspense>
+    <main className={`${ui.container} max-w-md`}>
+      <Suspense fallback={null}>
+        <LoginContent searchParams={searchParams} />
+      </Suspense>
+    </main>
   );
 }
 
-async function LoginContent() {
+async function LoginContent({ searchParams }: { searchParams: SearchParams }) {
   await connection();
-  const t = dict[await getLang()];
+  await getLang();
+  const { tab, error, check, reset } = await searchParams;
+
+  const current = tab === "registro" || tab === "codigo" ? tab : "entrar";
 
   return (
-    <main className={`${ui.container} max-w-md`}>
-      <h1 className={ui.title}>{t.loginTitle}</h1>
-      <p className={`mb-6 ${ui.subtitle}`}>{t.loginSubtitle}</p>
-      <LoginForm t={t} />
-    </main>
+    <>
+      <h1 className={ui.title}>Acceso</h1>
+      <p className={`mb-6 ${ui.subtitle}`}>Entra o crea tu cuenta sin salir de esta página.</p>
+      <LoginTabs tab={current} error={error} check={check} reset={reset === "1"} />
+    </>
   );
 }
