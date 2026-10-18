@@ -1,4 +1,4 @@
-﻿import { Suspense } from "react";
+import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
@@ -41,7 +41,7 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
 
   const { data: job } = await supabase
     .from("job_posts")
-    .select("id, title, description, pay_pln, pay_type, status, featured_until, author_id, kind, original_lang, availability, languages, cities(name), categories(name, slug)")
+    .select("id, title, description, pay_pln, pay_type, status, featured_until, author_id, kind, original_lang, availability, languages, localities(name), categories(name, slug)")
     .eq("id", id)
     .single();
 
@@ -86,7 +86,7 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
           <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
             <div>
               <dt className={ui.muted}>{t.cityLabel}</dt>
-              <dd className="font-medium text-slate-900 dark:text-slate-100">{job.cities?.name}</dd>
+              <dd className="font-medium text-slate-900 dark:text-slate-100">{job.localities?.name}</dd>
             </div>
             <div>
               <dt className={ui.muted}>{k[kind].rateLabel}</dt>
@@ -108,7 +108,7 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
               <div>
                 <dt className={ui.muted}>{k.spokenLanguages}</dt>
                 <dd className="font-medium text-slate-900 dark:text-slate-100">
-                  {job.languages.map((l: string) => k.langNames[l as Lang] ?? l).join(", ")}
+                  {job.languages.map((x: string) => k.langNames[x as Lang] ?? x).join(", ")}
                 </dd>
               </div>
             )}
@@ -132,7 +132,6 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
                 </p>
               )}
             </div>
-
             {!isFeatured && job.status === "active" && (
               <form action={startFeaturedCheckout.bind(null, job.id)}>
                 <button type="submit" className={ui.button}>{t.featureButton}</button>

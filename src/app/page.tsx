@@ -1,23 +1,18 @@
-﻿import { Suspense } from "react";
+import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { dict, getLang, type Dict } from "@/lib/i18n";
 import { kindDict, type Kind } from "@/lib/i18n-kinds";
+import { listingsText } from "@/lib/listings-i18n";
 import { localizeMany } from "@/lib/translate";
-import { boundingBox, distanceKm, formatKm, parseNear, type Near } from "@/lib/geo";
+import { boundingBox, distanceKm, formatKm, parseNear } from "@/lib/geo";
 import { geoText } from "@/lib/i18n-geo";
+import { listHref } from "@/lib/url";
 import { ui } from "@/lib/ui";
-import { NearMeButton } from "@/components/near-me-button";
+import { LocalityNav } from "@/components/locality-picker";
 
-type SearchParams = Promise<{
-  q?: string;
-  city?: string;
-  k?: string;
-  lat?: string;
-  lng?: string;
-  r?: string;
-}>;
+type SearchParams = Promise<{ q?: string; k?: string; lat?: string; lng?: string; r?: string }>;
 
 const KIND_LIST: Kind[] = ["job", "candidate", "service"];
 const RADIUS_OPTIONS = [5, 20, 50, 100];
@@ -33,7 +28,7 @@ type JobRow = {
   featured_until: string | null;
   lat: number | null;
   lng: number | null;
-  cities: { name: string } | null;
+  localities: { name: string } | null;
 };
 
 export default function Home(props: { searchParams: SearchParams }) {
@@ -44,52 +39,28 @@ export default function Home(props: { searchParams: SearchParams }) {
   );
 }
 
-function hrefWith(params: Record<string, string | undefined>) {
-  const sp = new URLSearchParams();
-  for (const [key, value] of Object.entries(params)) {
-    if (value) sp.set(key, value);
-  }
-  const qs = sp.toString();
-  return `/${qs ? `?${qs}` : ""}#ofertas`;
-}
-
-function withDistance(rows: JobRow[], near: Near | null) {
-  if (!near) return rows.map((r) => ({ ...r, distance: null as number | null }));
-  return rows
-    .map((r) => ({
-      ...r,
-      distance: r.lat != null && r.lng != null ? distanceKm(near.lat, near.lng, r.lat, r.lng) : null,
-    }))
-    .filter((r) => r.distance !== null && r.distance <= near.radius)
-    .sort((a, b) => (a.distance ?? 0) - (b.distance ?? 0));
-}
-
 async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   await connection();
   const lang = await getLang();
   const t = dict[lang];
   const k = kindDict[lang];
   const g = geoText[lang];
-  const { q, city, k: kindParam, lat, lng, r } = await searchParams;
+  const l = listingsText[lang];
+  const { q, k: kindParam, lat, lng, r } = await searchParams;
   const kind = KIND_LIST.includes(kindParam as Kind) ? (kindParam as Kind) : null;
   const near = parseNear(lat, lng, r);
-  const nearParams = near
-    ? { lat: String(near.lat), lng: String(near.lng), r: String(near.radius) }
-    : {};
+  const base = kind ? `/?k=${kind}` : "/";
 
   const supabase = await createClient();
   const now = new Date().toISOString();
 
-  const { data: cities } = await supabase.from("cities").select("id, name").order("name");
-
   const buildQuery = () => {
     let query = supabase
       .from("job_posts")
-      .select("id, title, description, pay_pln, pay_type, kind, original_lang, featured_until, lat, lng, cities(name)")
+      .select("id, title, description, pay_pln, pay_type, kind, original_lang, featured_until, lat, lng, localities(name)")
       .eq("status", "active");
     if (kind) query = query.eq("kind", kind);
     if (q) query = query.ilike("title", `%${q}%`);
-    if (city) query = query.eq("city_id", Number(city));
     if (near) {
       const box = boundingBox(near.lat, near.lng, near.radius);
       query = query
@@ -111,11 +82,17 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
     .order("bumped_at", { ascending: false })
     .limit(near ? 300 : 30);
 
-  const featuredRows = withDistance((featuredData ?? []) as JobRow[], near);
-  const rows = withDistance((rowsData ?? []) as JobRow[], near).slice(0, 30);
+  const withDist = (rows: JobRow[]) =>
+    rows
+      .map((row) => ({
+        ...row,
+        distance: near && row.lat != null && row.lng != null ? distanceKm(near.lat, near.lng, row.lat, row.lng) : null,
+      }))
+      .filter((row) => !near || (row.distance !== null && row.distance <= near.radius))
+      .sort((a, b) => (a.distance ?? 0) - (b.distance ?? 0));
 
-  const featuredJobs = await localizeMany(featuredRows, lang);
-  const jobs = await localizeMany(rows, lang);
+  const featuredJobs = await localizeMany(withDist((featuredData ?? []) as JobRow[]), lang);
+  const jobs = await localizeMany(withDist((rowsData ?? []) as JobRow[]).slice(0, 30), lang);
 
   return (
     <main className={ui.container}>
@@ -123,15 +100,22 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
         <h1 className={ui.title}>{t.heroTitle}</h1>
         <p className={`mt-2 max-w-2xl ${ui.subtitle}`}>{t.heroSubtitle}</p>
 
-        <div className="mt-5 flex flex-wrap items-start gap-3">
-          <NearMeButton lang={lang} radius={near?.radius ?? 20} />
-          <Link href="/mapa" className={ui.buttonSecondary}>{g.navMap}</Link>
+        <div className="mt-6 max-w-xl">
+          <LocalityNav
+            basePath={base}
+            label={l.nearLabel}
+            placeholder={l.nearPlaceholder}
+            noResults={t.localityNoResults}
+            radius={near?.radius ?? 20}
+          />
         </div>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <PathCard href="/jobs/new?kind=candidate" title={k.candidate.label} text={t.cardWorkText} />
           <PathCard href="/jobs/new?kind=job" title={k.job.label} text={t.cardHireText} />
           <PathCard href="/jobs/new?kind=service" title={k.service.label} text={t.cardServiceText} />
+          <PathCard href="/listados/sale" title={l.sale} text={l.saleSubtitle} />
+          <PathCard href="/listados/rent" title={l.rent} text={l.rentSubtitle} />
         </div>
       </section>
 
@@ -143,14 +127,14 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
               {RADIUS_OPTIONS.map((option) => (
                 <Link
                   key={option}
-                  href={hrefWith({ k: kind ?? undefined, lat: nearParams.lat, lng: nearParams.lng, r: String(option) })}
+                  href={listHref("/", { k: kind ?? undefined, q: q || undefined, lat: String(near.lat), lng: String(near.lng), r: String(option) })}
                   className={option === near.radius ? ui.button : ui.buttonSecondary}
                 >
                   {option} km
                 </Link>
               ))}
             </div>
-            <Link href={hrefWith({ k: kind ?? undefined })} className={ui.link}>{g.clearNear}</Link>
+            <Link href={listHref("/", { k: kind ?? undefined })} className={ui.link}>{l.clearNear}</Link>
           </div>
         )}
 
@@ -160,7 +144,12 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
             return (
               <Link
                 key={item}
-                href={hrefWith({ k: item === "all" ? undefined : item, ...nearParams })}
+                href={listHref("/", {
+                  k: item === "all" ? undefined : item,
+                  lat: near ? String(near.lat) : undefined,
+                  lng: near ? String(near.lng) : undefined,
+                  r: near ? String(near.radius) : undefined,
+                })}
                 className={active ? ui.button : ui.buttonSecondary}
               >
                 {item === "all" ? k.all : k[item].label}
@@ -169,7 +158,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
           })}
         </nav>
 
-        <form className="mb-10 grid gap-3 sm:grid-cols-[1fr_200px_auto]">
+        <form className="mb-10 grid gap-3 sm:grid-cols-[1fr_auto]">
           {kind && <input type="hidden" name="k" value={kind} />}
           {near && (
             <>
@@ -181,15 +170,6 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
           <div>
             <label htmlFor="q" className="sr-only">{t.searchLabel}</label>
             <input id="q" name="q" defaultValue={q} placeholder={t.searchPlaceholder} className={ui.input} />
-          </div>
-          <div>
-            <label htmlFor="city" className="sr-only">{t.cityLabel}</label>
-            <select id="city" name="city" defaultValue={city ?? ""} className={ui.input}>
-              <option value="">{t.allCities}</option>
-              {cities?.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
           </div>
           <button type="submit" className={ui.button}>{t.searchButton}</button>
         </form>
@@ -241,21 +221,11 @@ type CardJob = {
   title: string;
   pay_pln: number;
   pay_type: string;
-  cities: { name: string } | null;
+  localities: { name: string } | null;
   distance: number | null;
 };
 
-function JobCard({
-  job,
-  t,
-  badge,
-  featured = false,
-}: {
-  job: CardJob;
-  t: Dict;
-  badge: string;
-  featured?: boolean;
-}) {
+function JobCard({ job, t, badge, featured = false }: { job: CardJob; t: Dict; badge: string; featured?: boolean }) {
   return (
     <li className={featured ? ui.cardFeatured : ui.card}>
       <div className="mb-2 flex flex-wrap gap-2">
@@ -269,7 +239,7 @@ function JobCard({
         {job.title}
       </Link>
       <p className={`mt-1 ${ui.muted}`}>
-        {job.cities?.name} · {job.pay_pln} zł / {job.pay_type === "hour" ? t.perHour : t.perProject}
+        {job.localities?.name} · {job.pay_pln} zł / {job.pay_type === "hour" ? t.perHour : t.perProject}
         {job.distance !== null && <> · {formatKm(job.distance)}</>}
       </p>
     </li>

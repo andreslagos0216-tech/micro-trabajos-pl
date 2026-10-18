@@ -1,4 +1,4 @@
-﻿import { Suspense } from "react";
+import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
@@ -6,7 +6,9 @@ import { createClient } from "@/lib/supabase/server";
 import { dict, getLang, type Lang } from "@/lib/i18n";
 import { kindDict, type Kind } from "@/lib/i18n-kinds";
 import { adLangHint, adLangLabel, adLangPlaceholder, categoryName } from "@/lib/labels";
+import { listingsText } from "@/lib/listings-i18n";
 import { ui } from "@/lib/ui";
+import { LocalityPicker } from "@/components/locality-picker";
 import { createJob } from "./actions";
 
 type SearchParams = Promise<{ kind?: string }>;
@@ -27,6 +29,7 @@ async function NewJobContent({ searchParams }: { searchParams: SearchParams }) {
   const lang = await getLang();
   const t = dict[lang];
   const k = kindDict[lang];
+  const l = listingsText[lang];
 
   const { kind: kindParam } = await searchParams;
   const kind: Kind = KIND_LIST.includes(kindParam as Kind) ? (kindParam as Kind) : "job";
@@ -39,10 +42,11 @@ async function NewJobContent({ searchParams }: { searchParams: SearchParams }) {
 
   if (!user) redirect("/login");
 
-  const [{ data: cities }, { data: categories }] = await Promise.all([
-    supabase.from("cities").select("id, name").order("name"),
-    supabase.from("categories").select("id, name, slug").eq("section", "jobs").order("name"),
-  ]);
+  const { data: categories } = await supabase
+    .from("categories")
+    .select("id, name, slug")
+    .eq("section", "jobs")
+    .order("name");
 
   const showAvailability = kind !== "job";
 
@@ -66,8 +70,8 @@ async function NewJobContent({ searchParams }: { searchParams: SearchParams }) {
           <label htmlFor="original_lang" className={ui.label}>{adLangLabel[lang]}</label>
           <select id="original_lang" name="original_lang" required defaultValue="" className={ui.input}>
             <option value="" disabled>{adLangPlaceholder[lang]}</option>
-            {LANG_LIST.map((l) => (
-              <option key={l} value={l}>{k.langNames[l]}</option>
+            {LANG_LIST.map((x) => (
+              <option key={x} value={x}>{k.langNames[x]}</option>
             ))}
           </select>
           <p className={`mt-1.5 text-xs ${ui.muted}`}>{adLangHint[lang]}</p>
@@ -84,15 +88,13 @@ async function NewJobContent({ searchParams }: { searchParams: SearchParams }) {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor="city_id" className={ui.label}>{t.cityLabel}</label>
-            <select id="city_id" name="city_id" required defaultValue="" className={ui.input}>
-              <option value="" disabled>{t.selectCity}</option>
-              {cities?.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
-          </div>
+          <LocalityPicker
+            name="locality_id"
+            required
+            label={l.localityLabel}
+            placeholder={l.localityPlaceholder}
+            noResults={l.localityNoResults}
+          />
           <div>
             <label htmlFor="category_id" className={ui.label}>{t.categoryLabel}</label>
             <select id="category_id" name="category_id" required defaultValue="" className={ui.input}>
@@ -103,6 +105,7 @@ async function NewJobContent({ searchParams }: { searchParams: SearchParams }) {
             </select>
           </div>
         </div>
+        <p className={`-mt-3 text-xs ${ui.muted}`}>{l.localityHint}</p>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -132,10 +135,10 @@ async function NewJobContent({ searchParams }: { searchParams: SearchParams }) {
         <fieldset>
           <legend className={ui.label}>{k.spokenLanguages}</legend>
           <div className="flex flex-wrap gap-5 text-sm text-slate-800 dark:text-slate-200">
-            {LANG_LIST.map((l) => (
-              <label key={l} className="flex items-center gap-2">
-                <input type="checkbox" name="languages" value={l} className="h-4 w-4 accent-blue-700" />
-                {k.langNames[l]}
+            {LANG_LIST.map((x) => (
+              <label key={x} className="flex items-center gap-2">
+                <input type="checkbox" name="languages" value={x} className="h-4 w-4 accent-blue-700" />
+                {k.langNames[x]}
               </label>
             ))}
           </div>
@@ -149,4 +152,3 @@ async function NewJobContent({ searchParams }: { searchParams: SearchParams }) {
     </main>
   );
 }
-

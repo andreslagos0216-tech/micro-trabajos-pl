@@ -1,4 +1,4 @@
-﻿import { Suspense } from "react";
+import { Suspense } from "react";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getLang } from "@/lib/i18n";
@@ -22,7 +22,7 @@ async function MapContent() {
 
   const { data } = await supabase
     .from("job_posts")
-    .select("id, title, pay_pln, pay_type, lat, lng, cities(name)")
+    .select("id, title, pay_pln, pay_type, lat, lng, localities(name)")
     .eq("status", "active")
     .not("lat", "is", null)
     .order("bumped_at", { ascending: false })
@@ -35,7 +35,7 @@ async function MapContent() {
       title: j.title,
       lat: j.lat as number,
       lng: j.lng as number,
-      city: j.cities?.name ?? "",
+      city: j.localities?.name ?? "",
       pay: `${j.pay_pln} zł / ${j.pay_type === "hour" ? "h" : "→"}`,
     }));
 

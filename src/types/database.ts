@@ -149,7 +149,7 @@ export type Database = {
           availability: string | null
           bumped_at: string
           category_id: number
-          city_id: number
+          city_id: number | null
           created_at: string
           description: string
           featured_until: string | null
@@ -158,6 +158,7 @@ export type Database = {
           languages: string[]
           lat: number | null
           lng: number | null
+          locality_id: number | null
           original_lang: string
           pay_pln: number
           pay_type: string
@@ -169,7 +170,7 @@ export type Database = {
           availability?: string | null
           bumped_at?: string
           category_id: number
-          city_id: number
+          city_id?: number | null
           created_at?: string
           description: string
           featured_until?: string | null
@@ -178,6 +179,7 @@ export type Database = {
           languages?: string[]
           lat?: number | null
           lng?: number | null
+          locality_id?: number | null
           original_lang?: string
           pay_pln: number
           pay_type: string
@@ -189,7 +191,7 @@ export type Database = {
           availability?: string | null
           bumped_at?: string
           category_id?: number
-          city_id?: number
+          city_id?: number | null
           created_at?: string
           description?: string
           featured_until?: string | null
@@ -198,6 +200,7 @@ export type Database = {
           languages?: string[]
           lat?: number | null
           lng?: number | null
+          locality_id?: number | null
           original_lang?: string
           pay_pln?: number
           pay_type?: string
@@ -224,6 +227,13 @@ export type Database = {
             columns: ["city_id"]
             isOneToOne: false
             referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_posts_locality_id_fkey"
+            columns: ["locality_id"]
+            isOneToOne: false
+            referencedRelation: "localities"
             referencedColumns: ["id"]
           },
         ]
@@ -325,6 +335,36 @@ export type Database = {
           },
         ]
       }
+      listing_translations: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          lang: string
+          listing_id: string
+          listing_table: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          lang: string
+          listing_id: string
+          listing_table: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          lang?: string
+          listing_id?: string
+          listing_table?: string
+          title?: string
+        }
+        Relationships: []
+      }
       localities: {
         Row: {
           id: number
@@ -362,6 +402,8 @@ export type Database = {
           currency: string | null
           id: string
           job_id: string | null
+          listing_id: string | null
+          listing_table: string
           stripe_session_id: string
           type: string
           user_id: string
@@ -372,6 +414,8 @@ export type Database = {
           currency?: string | null
           id?: string
           job_id?: string | null
+          listing_id?: string | null
+          listing_table?: string
           stripe_session_id: string
           type: string
           user_id: string
@@ -382,6 +426,8 @@ export type Database = {
           currency?: string | null
           id?: string
           job_id?: string | null
+          listing_id?: string | null
+          listing_table?: string
           stripe_session_id?: string
           type?: string
           user_id?: string
@@ -540,27 +586,33 @@ export type Database = {
           created_at: string
           details: string | null
           id: string
-          job_id: string
+          job_id: string | null
           reason: string
+          rental_listing_id: string | null
           reporter_id: string
+          sale_listing_id: string | null
           status: string
         }
         Insert: {
           created_at?: string
           details?: string | null
           id?: string
-          job_id: string
+          job_id?: string | null
           reason: string
+          rental_listing_id?: string | null
           reporter_id: string
+          sale_listing_id?: string | null
           status?: string
         }
         Update: {
           created_at?: string
           details?: string | null
           id?: string
-          job_id?: string
+          job_id?: string | null
           reason?: string
+          rental_listing_id?: string | null
           reporter_id?: string
+          sale_listing_id?: string | null
           status?: string
         }
         Relationships: [
@@ -572,10 +624,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "reports_rental_listing_id_fkey"
+            columns: ["rental_listing_id"]
+            isOneToOne: false
+            referencedRelation: "rental_listings"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "reports_reporter_id_fkey"
             columns: ["reporter_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_sale_listing_id_fkey"
+            columns: ["sale_listing_id"]
+            isOneToOne: false
+            referencedRelation: "sale_listings"
             referencedColumns: ["id"]
           },
         ]

@@ -1,4 +1,4 @@
-﻿"use server";
+"use server";
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -16,16 +16,17 @@ export async function createJob(formData: FormData) {
 
   const kind = String(formData.get("kind"));
   const originalLang = String(formData.get("original_lang"));
-
   if (!KINDS.includes(kind) || !LANGS.includes(originalLang)) {
     throw new Error("Datos no válidos");
   }
 
-  const cityId = Number(formData.get("city_id"));
-  const { data: city } = await supabase
-    .from("cities")
+  const localityId = Number(formData.get("locality_id"));
+  if (!localityId) throw new Error("Selecciona una miejscowość de la lista");
+
+  const { data: loc } = await supabase
+    .from("localities")
     .select("lat, lng")
-    .eq("id", cityId)
+    .eq("id", localityId)
     .single();
 
   const availability = String(formData.get("availability") ?? "").trim();
@@ -36,7 +37,7 @@ export async function createJob(formData: FormData) {
       author_id: user.id,
       kind,
       original_lang: originalLang,
-      city_id: cityId,
+      locality_id: localityId,
       category_id: Number(formData.get("category_id")),
       title: String(formData.get("title")),
       description: String(formData.get("description")),
@@ -44,8 +45,8 @@ export async function createJob(formData: FormData) {
       pay_pln: Number(formData.get("pay_pln")),
       availability: availability || null,
       languages: formData.getAll("languages").map(String),
-      lat: city?.lat ?? null,
-      lng: city?.lng ?? null,
+      lat: loc?.lat ?? null,
+      lng: loc?.lng ?? null,
     })
     .select("id")
     .single();

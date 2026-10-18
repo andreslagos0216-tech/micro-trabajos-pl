@@ -1,9 +1,12 @@
-﻿import { cookies } from "next/headers";
+import { cookies } from "next/headers";
 
 export type Lang = "pl" | "es" | "en";
 
 const pl = {
   locale: "pl-PL",
+  navSale: "Sprzedaż",
+  navRent: "Wynajem",
+  localityNoResults: "Nie znaleziono. Sprawdź pisownię lub wybierz inną miejscowość.",
   navOffers: "Ogłoszenia",
   navPublish: "Dodaj ogłoszenie",
   navLogin: "Zaloguj się",
@@ -69,6 +72,9 @@ export type Dict = typeof pl;
 
 const es: Dict = {
   locale: "es-ES",
+  navSale: "Compraventa",
+  navRent: "Alquiler",
+  localityNoResults: "No encontrada. Revisa la escritura o elige otra localidad.",
   navOffers: "Anuncios",
   navPublish: "Publicar anuncio",
   navLogin: "Iniciar sesión",
@@ -132,6 +138,9 @@ const es: Dict = {
 
 const en: Dict = {
   locale: "en-GB",
+  navSale: "For sale",
+  navRent: "Rentals",
+  localityNoResults: "Not found. Check the spelling or choose another place.",
   navOffers: "Listings",
   navPublish: "Post a listing",
   navLogin: "Log in",
