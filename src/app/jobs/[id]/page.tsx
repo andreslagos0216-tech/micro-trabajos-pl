@@ -8,8 +8,10 @@ import { kindDict, type Kind } from "@/lib/i18n-kinds";
 import { categoryName } from "@/lib/labels";
 import { localizeJob } from "@/lib/translate";
 import { reportText } from "@/lib/report-i18n";
+import { detailText } from "@/lib/detail-i18n";
 import { ui } from "@/lib/ui";
 import { ReportForm } from "@/components/report-form";
+import { JobContact } from "@/components/job-contact";
 import { startFeaturedCheckout } from "./actions";
 
 type Params = Promise<{ id: string }>;
@@ -31,6 +33,7 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
   const t = dict[lang];
   const k = kindDict[lang];
   const r = reportText[lang];
+  const d = detailText[lang];
   const { id } = await params;
   const { reported } = await searchParams;
   const supabase = await createClient();
@@ -41,7 +44,7 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
 
   const { data: job } = await supabase
     .from("job_posts")
-    .select("id, title, description, pay_pln, pay_type, status, featured_until, author_id, kind, original_lang, availability, languages, localities(name), categories(name, slug)")
+    .select("id, title, description, pay_pln, pay_agreed, pay_type, status, featured_until, author_id, kind, original_lang, availability, languages, localities(name), categories(name, slug)")
     .eq("id", id)
     .single();
 
@@ -55,8 +58,7 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
   const isOwner = user?.id === job.author_id;
   const isFeatured = !!job.featured_until && new Date(job.featured_until) > new Date();
   const kind = job.kind as Kind;
-  const statusLabel =
-    job.status === "active" ? t.statusActive : job.status === "paused" ? t.statusPaused : t.statusClosed;
+  const statusLabel = d.statusNames[job.status] ?? job.status;
   const category = categoryName(job.categories?.slug, lang, job.categories?.name ?? "");
 
   return (
@@ -90,7 +92,9 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
             </div>
             <div>
               <dt className={ui.muted}>{k[kind].rateLabel}</dt>
-              <dd className="font-medium text-slate-900 dark:text-slate-100">{job.pay_pln} zł</dd>
+              <dd className="font-medium text-slate-900 dark:text-slate-100">
+                {job.pay_agreed ? t.agreedPrice : `${job.pay_pln} zł`}
+              </dd>
             </div>
             <div>
               <dt className={ui.muted}>{t.payTypeLabel}</dt>
@@ -141,10 +145,21 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
         )}
       </article>
 
+      <div className="mt-6">
+        <JobContact
+          lang={lang}
+          jobId={job.id}
+          authorId={job.author_id}
+          title={local.title}
+          status={job.status}
+          viewerId={user?.id ?? null}
+        />
+      </div>
+
       {!isOwner && (
         <div className="mt-6">
           {user ? (
-            <ReportForm jobId={job.id} lang={lang} />
+            <ReportForm targetType="job" targetId={job.id} returnPath={"/jobs/" + job.id} lang={lang} />
           ) : (
             <p className="text-sm">
               <Link href="/login" className={ui.link}>{r.loginFirst}</Link>

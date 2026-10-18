@@ -118,10 +118,10 @@ async function NewJobContent({ searchParams }: { searchParams: SearchParams }) {
           <div>
             <label htmlFor="pay_pln" className={ui.label}>{text.rateLabel}</label>
             <div className="relative">
-              <input id="pay_pln" name="pay_pln" type="number" step="0.01" min="1" required placeholder="0.00" className={`${ui.input} pr-12`} />
+              <input id="pay_pln" name="pay_pln" type="number" step="0.01" min="1" placeholder="0.00" className={`${ui.input} pr-12`} />
               <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm font-semibold text-slate-600 dark:text-slate-300">zł</span>
             </div>
-            <p className={`mt-1.5 text-xs ${ui.muted}`}>{t.rateHint}</p>
+            <p className={`mt-1.5 text-xs ${ui.muted}`}>{t.rateHint}</p><label className="mt-2 flex items-center gap-2 text-sm text-slate-800 dark:text-slate-200"><input type="checkbox" name="pay_agreed" className="h-4 w-4 accent-blue-700" />{t.agreedPrice}</label>
           </div>
         </div>
 

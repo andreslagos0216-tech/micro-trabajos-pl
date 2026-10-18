@@ -26,6 +26,7 @@ type JobRow = {
   title: string;
   description: string;
   pay_pln: number;
+  pay_agreed: boolean;
   pay_type: string;
   kind: string;
   original_lang: string;
@@ -59,7 +60,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   const buildQuery = () => {
     let query = supabase
       .from("job_posts")
-      .select("id, title, description, pay_pln, pay_type, kind, original_lang, featured_until, lat, lng, localities(name)")
+      .select("id, title, description, pay_pln, pay_agreed, pay_type, kind, original_lang, featured_until, lat, lng, localities(name)")
       .eq("status", "active");
     if (kind) query = query.eq("kind", kind);
     if (q) query = query.ilike("title", `%${q}%`);
@@ -236,12 +237,23 @@ type CardJob = {
   id: string;
   title: string;
   pay_pln: number;
+  pay_agreed: boolean;
   pay_type: string;
   localities: { name: string } | null;
   distance: number | null;
 };
 
-function JobCard({ job, t, badge, featured = false }: { job: CardJob; t: Dict; badge: string; featured?: boolean }) {
+function JobCard({
+  job,
+  t,
+  badge,
+  featured = false,
+}: {
+  job: CardJob;
+  t: Dict;
+  badge: string;
+  featured?: boolean;
+}) {
   return (
     <li className={featured ? ui.cardFeatured : ui.card}>
       <div className="mb-2 flex flex-wrap gap-2">
@@ -255,7 +267,7 @@ function JobCard({ job, t, badge, featured = false }: { job: CardJob; t: Dict; b
         {job.title}
       </Link>
       <p className={`mt-1 ${ui.muted}`}>
-        {job.localities?.name} · {job.pay_pln} zł / {job.pay_type === "hour" ? t.perHour : t.perProject}
+        {job.localities?.name} · {job.pay_agreed ? t.agreedPrice : `${job.pay_pln} zł / ${job.pay_type === "hour" ? t.perHour : t.perProject}`}
         {job.distance !== null && <> · {formatKm(job.distance)}</>}
       </p>
     </li>

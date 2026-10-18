@@ -41,10 +41,11 @@ async function ProfileContent({ searchParams }: { searchParams: SearchParams }) 
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, phone, bio, languages, is_verified, created_at, localities(name)")
+    .select("full_name, bio, languages, is_verified, created_at, localities(name)")
     .eq("id", user.id)
     .single();
 
+  const { data: contact } = await supabase.from("profile_contacts").select("phone").eq("profile_id", user.id).maybeSingle();
   const [jobs, sales, rents] = await Promise.all([
     supabase.from("job_posts").select("id, title, status, kind").eq("author_id", user.id).order("created_at", { ascending: false }).limit(50),
     supabase.from("sale_listings").select("id, title, status").eq("author_id", user.id).order("created_at", { ascending: false }).limit(50),
@@ -95,7 +96,7 @@ async function ProfileContent({ searchParams }: { searchParams: SearchParams }) 
           </div>
           <div>
             <label htmlFor="phone" className={ui.label}>{t.phoneLabel}</label>
-            <input id="phone" name="phone" maxLength={20} defaultValue={profile?.phone ?? ""} className={ui.input} />
+            <input id="phone" name="phone" maxLength={20} defaultValue={contact?.phone ?? ""} className={ui.input} />
           </div>
           <div>
             <label htmlFor="bio" className={ui.label}>{t.bioLabel}</label>

@@ -160,7 +160,8 @@ export type Database = {
           lng: number | null
           locality_id: number | null
           original_lang: string
-          pay_pln: number
+          pay_agreed: boolean
+          pay_pln: number | null
           pay_type: string
           status: string
           title: string
@@ -181,7 +182,8 @@ export type Database = {
           lng?: number | null
           locality_id?: number | null
           original_lang?: string
-          pay_pln: number
+          pay_agreed?: boolean
+          pay_pln?: number | null
           pay_type: string
           status?: string
           title: string
@@ -202,7 +204,8 @@ export type Database = {
           lng?: number | null
           locality_id?: number | null
           original_lang?: string
-          pay_pln?: number
+          pay_agreed?: boolean
+          pay_pln?: number | null
           pay_type?: string
           status?: string
           title?: string
@@ -449,6 +452,32 @@ export type Database = {
           },
         ]
       }
+      profile_contacts: {
+        Row: {
+          phone: string | null
+          profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          phone?: string | null
+          profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          phone?: string | null
+          profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_contacts_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           bio: string | null
@@ -459,7 +488,6 @@ export type Database = {
           is_verified: boolean
           languages: string[]
           locality_id: number | null
-          phone: string | null
         }
         Insert: {
           bio?: string | null
@@ -470,7 +498,6 @@ export type Database = {
           is_verified?: boolean
           languages?: string[]
           locality_id?: number | null
-          phone?: string | null
         }
         Update: {
           bio?: string | null
@@ -481,7 +508,6 @@ export type Database = {
           is_verified?: boolean
           languages?: string[]
           locality_id?: number | null
-          phone?: string | null
         }
         Relationships: [
           {

@@ -1,20 +1,28 @@
-﻿import { reportJob } from "@/app/jobs/[id]/report-actions";
+import { reportListing } from "@/app/jobs/[id]/report-actions";
 import { reportText, type ReportDict } from "@/lib/report-i18n";
 import type { Lang } from "@/lib/i18n";
 import { ui } from "@/lib/ui";
 
 type ReasonKey = keyof ReportDict["reasons"];
 
-export function ReportForm({ jobId, lang }: { jobId: string; lang: Lang }) {
+export function ReportForm({
+  targetType,
+  targetId,
+  returnPath,
+  lang,
+}: {
+  targetType: "job" | "sale" | "rent";
+  targetId: string;
+  returnPath: string;
+  lang: Lang;
+}) {
   const t = reportText[lang];
-  const reportAction = reportJob.bind(null, jobId);
+  const reportAction = reportListing.bind(null, targetType, targetId, returnPath);
   const reasons = Object.keys(t.reasons) as ReasonKey[];
 
   return (
     <details className="rounded-md border border-slate-200 bg-white p-4 text-sm dark:border-slate-700 dark:bg-slate-900">
-      <summary className="cursor-pointer font-medium text-slate-800 dark:text-slate-200">
-        {t.open}
-      </summary>
+      <summary className="cursor-pointer font-medium text-slate-800 dark:text-slate-200">{t.open}</summary>
 
       <form action={reportAction} className="mt-4 space-y-4">
         <p className={ui.muted}>{t.intro}</p>

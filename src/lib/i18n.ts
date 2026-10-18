@@ -4,6 +4,7 @@ export type Lang = "pl" | "es" | "en";
 
 const pl = {
   locale: "pl-PL",
+  agreedPrice: "Do uzgodnienia",
   navSale: "Sprzedaż",
   navRent: "Wynajem",
   localityNoResults: "Nie znaleziono. Sprawdź pisownię lub wybierz inną miejscowość.",
@@ -72,6 +73,7 @@ export type Dict = typeof pl;
 
 const es: Dict = {
   locale: "es-ES",
+  agreedPrice: "A convenir",
   navSale: "Compraventa",
   navRent: "Alquiler",
   localityNoResults: "No encontrada. Revisa la escritura o elige otra localidad.",
@@ -138,6 +140,7 @@ const es: Dict = {
 
 const en: Dict = {
   locale: "en-GB",
+  agreedPrice: "Negotiable",
   navSale: "For sale",
   navRent: "Rentals",
   localityNoResults: "Not found. Check the spelling or choose another place.",

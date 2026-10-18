@@ -18,16 +18,23 @@ export async function updateProfile(formData: FormData) {
   const languages = formData.getAll("languages").map(String).filter((l) => LANGS.includes(l));
   const localityRaw = String(formData.get("locality_id") ?? "");
 
-  const update = {
-    full_name: fullName || null,
-    phone: phone || null,
-    bio: bio || null,
-    languages,
-    ...(localityRaw ? { locality_id: Number(localityRaw) } : {}),
-  };
-
-  const { error } = await supabase.from("profiles").update(update).eq("id", user.id);
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      full_name: fullName || null,
+      bio: bio || null,
+      languages,
+      ...(localityRaw ? { locality_id: Number(localityRaw) } : {}),
+    })
+    .eq("id", user.id);
   if (error) throw new Error(error.message);
+
+  const { error: contactError } = await supabase.from("profile_contacts").upsert({
+    profile_id: user.id,
+    phone: phone || null,
+    updated_at: new Date().toISOString(),
+  });
+  if (contactError) throw new Error(contactError.message);
 
   redirect("/perfil?saved=1");
 }
