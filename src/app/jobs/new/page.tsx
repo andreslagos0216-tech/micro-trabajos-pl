@@ -41,7 +41,7 @@ async function NewJobContent({ searchParams }: { searchParams: SearchParams }) {
 
   const [{ data: cities }, { data: categories }] = await Promise.all([
     supabase.from("cities").select("id, name").order("name"),
-    supabase.from("categories").select("id, name, slug").order("name"),
+    supabase.from("categories").select("id, name, slug").eq("section", "jobs").order("name"),
   ]);
 
   const showAvailability = kind !== "job";
@@ -149,3 +149,4 @@ async function NewJobContent({ searchParams }: { searchParams: SearchParams }) {
     </main>
   );
 }
+
