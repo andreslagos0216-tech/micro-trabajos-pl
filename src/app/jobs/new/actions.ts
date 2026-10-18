@@ -21,6 +21,13 @@ export async function createJob(formData: FormData) {
     throw new Error("Datos no válidos");
   }
 
+  const cityId = Number(formData.get("city_id"));
+  const { data: city } = await supabase
+    .from("cities")
+    .select("lat, lng")
+    .eq("id", cityId)
+    .single();
+
   const availability = String(formData.get("availability") ?? "").trim();
 
   const { data: job, error } = await supabase
@@ -29,7 +36,7 @@ export async function createJob(formData: FormData) {
       author_id: user.id,
       kind,
       original_lang: originalLang,
-      city_id: Number(formData.get("city_id")),
+      city_id: cityId,
       category_id: Number(formData.get("category_id")),
       title: String(formData.get("title")),
       description: String(formData.get("description")),
@@ -37,6 +44,8 @@ export async function createJob(formData: FormData) {
       pay_pln: Number(formData.get("pay_pln")),
       availability: availability || null,
       languages: formData.getAll("languages").map(String),
+      lat: city?.lat ?? null,
+      lng: city?.lng ?? null,
     })
     .select("id")
     .single();

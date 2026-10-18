@@ -102,16 +102,22 @@ export type Database = {
       cities: {
         Row: {
           id: number
+          lat: number | null
+          lng: number | null
           name: string
           slug: string
         }
         Insert: {
           id?: number
+          lat?: number | null
+          lng?: number | null
           name: string
           slug: string
         }
         Update: {
           id?: number
+          lat?: number | null
+          lng?: number | null
           name?: string
           slug?: string
         }
@@ -130,6 +136,8 @@ export type Database = {
           id: string
           kind: string
           languages: string[]
+          lat: number | null
+          lng: number | null
           original_lang: string
           pay_pln: number
           pay_type: string
@@ -148,6 +156,8 @@ export type Database = {
           id?: string
           kind?: string
           languages?: string[]
+          lat?: number | null
+          lng?: number | null
           original_lang?: string
           pay_pln: number
           pay_type: string
@@ -166,6 +176,8 @@ export type Database = {
           id?: string
           kind?: string
           languages?: string[]
+          lat?: number | null
+          lng?: number | null
           original_lang?: string
           pay_pln?: number
           pay_type?: string

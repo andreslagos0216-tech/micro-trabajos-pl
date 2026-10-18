@@ -1,6 +1,7 @@
 ﻿import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { dict, getLang, type Lang } from "@/lib/i18n";
+import { geoText } from "@/lib/i18n-geo";
 
 function LangSwitcher({ current }: { current: Lang }) {
   const langs: Lang[] = ["pl", "es", "en"];
@@ -29,6 +30,7 @@ function LangSwitcher({ current }: { current: Lang }) {
 export async function SiteHeader() {
   const lang = await getLang();
   const t = dict[lang];
+  const g = geoText[lang];
 
   return (
     <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
@@ -36,6 +38,7 @@ export async function SiteHeader() {
         <Logo />
         <nav className="flex flex-wrap items-center gap-5 text-sm font-medium text-slate-700 dark:text-slate-300">
           <Link href="/" className="hover:text-blue-700 dark:hover:text-blue-400">{t.navOffers}</Link>
+          <Link href="/mapa" className="hover:text-blue-700 dark:hover:text-blue-400">{g.navMap}</Link>
           <Link href="/jobs/new" className="hover:text-blue-700 dark:hover:text-blue-400">{t.navPublish}</Link>
           <Link href="/login" className="hover:text-blue-700 dark:hover:text-blue-400">{t.navLogin}</Link>
           <LangSwitcher current={lang} />
