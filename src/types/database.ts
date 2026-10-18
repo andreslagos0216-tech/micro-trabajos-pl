@@ -85,19 +85,39 @@ export type Database = {
         Row: {
           id: number
           name: string
+          name_en: string | null
+          name_es: string | null
+          parent_id: number | null
+          section: string
           slug: string
         }
         Insert: {
           id?: number
           name: string
+          name_en?: string | null
+          name_es?: string | null
+          parent_id?: number | null
+          section?: string
           slug: string
         }
         Update: {
           id?: number
           name?: string
+          name_en?: string | null
+          name_es?: string | null
+          parent_id?: number | null
+          section?: string
           slug?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       cities: {
         Row: {
@@ -243,6 +263,98 @@ export type Database = {
           },
         ]
       }
+      listing_photos: {
+        Row: {
+          author_id: string
+          created_at: string
+          id: string
+          job_post_id: string | null
+          position: number
+          rental_listing_id: string | null
+          sale_listing_id: string | null
+          storage_path: string
+        }
+        Insert: {
+          author_id: string
+          created_at?: string
+          id?: string
+          job_post_id?: string | null
+          position?: number
+          rental_listing_id?: string | null
+          sale_listing_id?: string | null
+          storage_path: string
+        }
+        Update: {
+          author_id?: string
+          created_at?: string
+          id?: string
+          job_post_id?: string | null
+          position?: number
+          rental_listing_id?: string | null
+          sale_listing_id?: string | null
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_photos_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_photos_job_post_id_fkey"
+            columns: ["job_post_id"]
+            isOneToOne: false
+            referencedRelation: "job_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_photos_rental_listing_id_fkey"
+            columns: ["rental_listing_id"]
+            isOneToOne: false
+            referencedRelation: "rental_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_photos_sale_listing_id_fkey"
+            columns: ["sale_listing_id"]
+            isOneToOne: false
+            referencedRelation: "sale_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      localities: {
+        Row: {
+          id: number
+          lat: number
+          lng: number
+          name: string
+          name_norm: string
+          population: number
+          voivodeship: string | null
+        }
+        Insert: {
+          id: number
+          lat: number
+          lng: number
+          name: string
+          name_norm: string
+          population?: number
+          voivodeship?: string | null
+        }
+        Update: {
+          id?: number
+          lat?: number
+          lng?: number
+          name?: string
+          name_norm?: string
+          population?: number
+          voivodeship?: string | null
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           amount: number | null
@@ -328,6 +440,97 @@ export type Database = {
             columns: ["city_id"]
             isOneToOne: false
             referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rental_listings: {
+        Row: {
+          area_m2: number | null
+          attributes: Json
+          author_id: string
+          bills_included: boolean | null
+          bumped_at: string
+          category_id: number
+          created_at: string
+          deposit_pln: number | null
+          description: string
+          featured_until: string | null
+          furnished: boolean | null
+          id: string
+          lat: number | null
+          lng: number | null
+          locality_id: number | null
+          original_lang: string
+          rent_pln: number
+          rooms: number | null
+          status: string
+          title: string
+        }
+        Insert: {
+          area_m2?: number | null
+          attributes?: Json
+          author_id: string
+          bills_included?: boolean | null
+          bumped_at?: string
+          category_id: number
+          created_at?: string
+          deposit_pln?: number | null
+          description: string
+          featured_until?: string | null
+          furnished?: boolean | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          locality_id?: number | null
+          original_lang?: string
+          rent_pln: number
+          rooms?: number | null
+          status?: string
+          title: string
+        }
+        Update: {
+          area_m2?: number | null
+          attributes?: Json
+          author_id?: string
+          bills_included?: boolean | null
+          bumped_at?: string
+          category_id?: number
+          created_at?: string
+          deposit_pln?: number | null
+          description?: string
+          featured_until?: string | null
+          furnished?: boolean | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          locality_id?: number | null
+          original_lang?: string
+          rent_pln?: number
+          rooms?: number | null
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rental_listings_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rental_listings_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rental_listings_locality_id_fkey"
+            columns: ["locality_id"]
+            isOneToOne: false
+            referencedRelation: "localities"
             referencedColumns: ["id"]
           },
         ]
@@ -425,6 +628,88 @@ export type Database = {
             columns: ["reviewer_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sale_listings: {
+        Row: {
+          attributes: Json
+          author_id: string
+          bumped_at: string
+          category_id: number
+          condition: string | null
+          created_at: string
+          description: string
+          featured_until: string | null
+          id: string
+          lat: number | null
+          lng: number | null
+          locality_id: number | null
+          original_lang: string
+          price_negotiable: boolean
+          price_pln: number
+          status: string
+          title: string
+        }
+        Insert: {
+          attributes?: Json
+          author_id: string
+          bumped_at?: string
+          category_id: number
+          condition?: string | null
+          created_at?: string
+          description: string
+          featured_until?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          locality_id?: number | null
+          original_lang?: string
+          price_negotiable?: boolean
+          price_pln: number
+          status?: string
+          title: string
+        }
+        Update: {
+          attributes?: Json
+          author_id?: string
+          bumped_at?: string
+          category_id?: number
+          condition?: string | null
+          created_at?: string
+          description?: string
+          featured_until?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          locality_id?: number | null
+          original_lang?: string
+          price_negotiable?: boolean
+          price_pln?: number
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sale_listings_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sale_listings_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sale_listings_locality_id_fkey"
+            columns: ["locality_id"]
+            isOneToOne: false
+            referencedRelation: "localities"
             referencedColumns: ["id"]
           },
         ]
