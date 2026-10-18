@@ -458,6 +458,7 @@ export type Database = {
           id: string
           is_verified: boolean
           languages: string[]
+          locality_id: number | null
           phone: string | null
         }
         Insert: {
@@ -468,6 +469,7 @@ export type Database = {
           id: string
           is_verified?: boolean
           languages?: string[]
+          locality_id?: number | null
           phone?: string | null
         }
         Update: {
@@ -478,6 +480,7 @@ export type Database = {
           id?: string
           is_verified?: boolean
           languages?: string[]
+          locality_id?: number | null
           phone?: string | null
         }
         Relationships: [
@@ -486,6 +489,13 @@ export type Database = {
             columns: ["city_id"]
             isOneToOne: false
             referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_locality_id_fkey"
+            columns: ["locality_id"]
+            isOneToOne: false
+            referencedRelation: "localities"
             referencedColumns: ["id"]
           },
         ]
