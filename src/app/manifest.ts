@@ -1,9 +1,9 @@
-﻿import type { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "SC opcje",
-    short_name: "SC opcje",
+    name: "TaskGo",
+    short_name: "TaskGo",
     description: "Ogłoszenia o pracy i usługach w Polsce.",
     start_url: "/",
     scope: "/",

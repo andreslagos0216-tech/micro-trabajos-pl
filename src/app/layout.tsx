@@ -1,4 +1,4 @@
-﻿import type { Metadata, Viewport } from "next";
+import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { InstallBanner } from "@/components/install-banner";
@@ -6,12 +6,12 @@ import { SwRegister } from "@/components/sw-register";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "SC opcje", template: "%s · SC opcje" },
+  title: { default: "TaskGo", template: "%s · TaskGo" },
   description: "Ogłoszenia o pracy i usługach w Polsce. Praca dorywcza, na godziny i usługi między osobami prywatnymi.",
-  applicationName: "SC opcje",
+  applicationName: "TaskGo",
   appleWebApp: {
     capable: true,
-    title: "SC opcje",
+    title: "TaskGo",
     statusBarStyle: "default",
   },
   icons: {

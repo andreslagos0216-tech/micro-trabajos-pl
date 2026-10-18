@@ -92,7 +92,7 @@ export async function SiteFooter() {
   return (
     <footer className="border-t border-slate-200 bg-white text-sm text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
       <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-6 sm:flex-row sm:flex-wrap sm:justify-between">
-        <span>SC opcje · {t.footerRights}</span>
+        <span>TaskGo · {t.footerRights}</span>
         <nav className="flex gap-5">
           <Link href="/regulamin" className="hover:underline">{t.footerLegal}</Link>
           <Link href="/polityka-prywatnosci" className="hover:underline">{t.footerPrivacy}</Link>

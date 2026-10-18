@@ -1,6 +1,7 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal";
 import { ui } from "@/lib/ui";
+import { legal } from "@/lib/legal";
 
 export const metadata: Metadata = { title: "Regulamin" };
 
@@ -9,38 +10,39 @@ export default function Terms() {
     <LegalPage title="Regulamin">
       <section>
         <h2 className={ui.sectionTitle}>1. Postanowienia ogólne</h2>
-        <p>Regulamin określa zasady korzystania z serwisu SC opcje, dostępnego pod adresem micro-trabajos-pl.vercel.app (dalej: „Serwis”). Operatorem Serwisu jest [NAZWA FIRMY], [ADRES], NIP [NIP], kontakt: [E-MAIL].</p>
-        <p>Serwis jest platformą ogłoszeniową, która łączy osoby publikujące oferty pracy i usług z osobami, które je wykonują. Serwis nie jest agencją pracy, nie zatrudnia wykonawców i nie pośredniczy w zawieraniu umów o pracę.</p>
+        <p>Regulamin określa zasady korzystania z serwisu {legal.brand}, dostępnego pod adresem {legal.domain} (dalej: „Serwis”). Operatorem Serwisu jest {legal.operatorName}, {legal.operatorType}, adres: {legal.address}, kontakt: {legal.email}.</p>
+        <p>Serwis jest platformą ogłoszeniową, która łączy osoby publikujące oferty pracy, usług, sprzedaży i wynajmu z osobami zainteresowanymi. Serwis nie jest agencją pracy, nie zatrudnia wykonawców i nie pośredniczy w zawieraniu umów o pracę.</p>
       </section>
 
       <section>
         <h2 className={ui.sectionTitle}>2. Konto użytkownika</h2>
-        <p>Do publikowania ofert potrzebne jest konto. Logowanie odbywa się za pomocą jednorazowego linku wysyłanego na adres e-mail. Użytkownik odpowiada za bezpieczeństwo dostępu do swojej skrzynki pocztowej i podaje prawdziwe dane.</p>
+        <p>Do publikowania ogłoszeń potrzebne jest konto założone z adresem e-mail i hasłem. Użytkownik podaje prawdziwe dane i odpowiada za bezpieczeństwo swojego konta. Hasło może zmienić w każdej chwili lub odzyskać je za pomocą kodu wysłanego na adres e-mail.</p>
       </section>
 
       <section>
-        <h2 className={ui.sectionTitle}>3. Publikowanie ofert</h2>
-        <p>Oferta musi opisywać rzeczywistą pracę lub usługę oraz podawać wynagrodzenie w złotych (PLN). Zabronione są oferty niezgodne z prawem, dyskryminujące ze względu na płeć, wiek, pochodzenie, wyznanie, orientację lub niepełnosprawność, oraz oferty wzywające do pracy bez wymaganych pozwoleń.</p>
+        <h2 className={ui.sectionTitle}>3. Publikowanie ogłoszeń</h2>
+        <p>Ogłoszenie musi dotyczyć rzeczywistej pracy, usługi, sprzedaży lub wynajmu. Zabronione są ogłoszenia niezgodne z prawem, wprowadzające w błąd, dyskryminujące ze względu na płeć, wiek, pochodzenie, wyznanie, orientację lub niepełnosprawność, oraz ogłoszenia dotyczące pracy bez wymaganych zezwoleń.</p>
+        <p>W ogłoszeniach dotyczących wynajmu zabronione jest żądanie zaliczek przed obejrzeniem lokalu oraz wymaganie płatności poza umową.</p>
       </section>
 
       <section>
         <h2 className={ui.sectionTitle}>4. Relacja między użytkownikami</h2>
-        <p>Umowa o wykonanie pracy lub usługi zawierana jest bezpośrednio między stronami. Serwis nie odpowiada za jakość, terminowość ani zapłatę wynagrodzenia. Zalecamy spisanie warunków współpracy na piśmie.</p>
+        <p>Umowa o pracę, o wykonanie usługi, sprzedaży lub najmu zawierana jest bezpośrednio między stronami. Serwis nie odpowiada za jakość, terminowość, zapłatę ani stan przedmiotów i lokali. Zalecamy spisanie warunków współpracy na piśmie.</p>
       </section>
 
       <section>
         <h2 className={ui.sectionTitle}>5. Wyróżnienie ogłoszeń i płatności</h2>
-        <p>Wyróżnienie ogłoszenia kosztuje 19 zł brutto i trwa 7 dni od momentu płatności. Płatności obsługuje Stripe. Po aktywacji wyróżnienia zwrot jest możliwy tylko wtedy, gdy wynika to z przepisów prawa.</p>
+        <p>Wyróżnienie ogłoszenia kosztuje 19 zł brutto i trwa 7 dni od momentu płatności. Płatności obsługuje Stripe. Zwrot jest możliwy tylko wtedy, gdy wynika to z przepisów prawa.</p>
       </section>
 
       <section>
         <h2 className={ui.sectionTitle}>6. Zgłaszanie treści</h2>
-        <p>Każdy może zgłosić ogłoszenie naruszające regulamin, korzystając z przycisku „Zgłoś” przy ofercie. Operator sprawdza zgłoszenie bez zbędnej zwłoki i może usunąć treść lub zawiesić konto. O decyzji informuje zgłaszającego i autora treści, podając powód.</p>
+        <p>Każdy zalogowany użytkownik może zgłosić ogłoszenie przyciskiem zgłoś. Operator sprawdza zgłoszenie bez zbędnej zwłoki i może usunąć treść lub zawiesić konto. O decyzji informuje zgłaszającego i autora treści, podając powód.</p>
       </section>
 
       <section>
         <h2 className={ui.sectionTitle}>7. Zawieszenie i usunięcie konta</h2>
-        <p>Użytkownik może w każdej chwili usunąć konto. Operator może zawiesić konto w razie naruszenia regulaminu lub przepisów prawa.</p>
+        <p>Użytkownik może w każdej chwili usunąć konto, kontaktując się z operatorem. Operator może zawiesić konto w razie naruszenia regulaminu lub przepisów prawa.</p>
       </section>
 
       <section>
@@ -55,7 +57,7 @@ export default function Terms() {
 
       <section>
         <h2 className={ui.sectionTitle}>10. Prawo właściwe i zmiany</h2>
-        <p>Regulamin podlega prawu polskiemu. Operator może zmienić regulamin; o istotnych zmianach poinformuje użytkowników z wyprzedzeniem, a dalsze korzystanie z Serwisu oznacza ich akceptację.</p>
+        <p>Regulamin podlega prawu polskiemu. Operator może zmienić regulamin; o istotnych zmianach poinformuje użytkowników z wyprzedzeniem. Ostatnia aktualizacja: {legal.lastUpdate}.</p>
       </section>
     </LegalPage>
   );
