@@ -1,23 +1,23 @@
 import { ui } from "@/lib/ui";
-import { signInWithPassword, signUpWithPassword, sendCode, verifyCode, resetPassword } from "@/app/login/actions";
+import { signInWithPassword, signUpWithPassword, requestResetCode, setNewPassword } from "@/app/login/actions";
 
-type Tab = "entrar" | "registro" | "codigo";
+type Tab = "entrar" | "registro" | "recuperar";
 
 export function LoginTabs({
   tab,
   error,
   check,
-  reset,
+  created,
 }: {
   tab: Tab;
   error?: string;
   check?: string;
-  reset?: boolean;
+  created?: boolean;
 }) {
   const tabs: { id: Tab; label: string }[] = [
-    { id: "entrar", label: "Entrar con contraseña" },
+    { id: "entrar", label: "Entrar" },
     { id: "registro", label: "Crear cuenta" },
-    { id: "codigo", label: "Entrar con código" },
+    { id: "recuperar", label: "Olvidé mi contraseña" },
   ];
 
   const messages: Record<string, string> = {
@@ -25,8 +25,7 @@ export function LoginTabs({
     corta: "La contraseña debe tener al menos 8 caracteres.",
     registro: "No se pudo crear la cuenta. Puede que el correo ya exista.",
     codigo: "No se pudo enviar el código. Inténtalo de nuevo en unos minutos.",
-    codigo_no_valido: "El código no es válido o ha caducado.",
-    enlace: "El enlace ya no es válido. Pide uno nuevo.",
+    codigo_no_valido: "El código no es válido o ha caducado. Pide uno nuevo.",
   };
 
   return (
@@ -48,7 +47,11 @@ export function LoginTabs({
       </nav>
 
       {error && messages[error] && <p className={ui.errorBox}>{messages[error]}</p>}
-      {reset && <p className="rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-200">Te enviamos un correo para cambiar la contraseña.</p>}
+      {created && (
+        <p className="rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-200">
+          Cuenta creada. Ya puedes entrar con tu correo y contraseña.
+        </p>
+      )}
 
       {tab === "entrar" && (
         <form action={signInWithPassword} className={`${ui.card} space-y-4`}>
@@ -61,10 +64,6 @@ export function LoginTabs({
             <input id="password1" name="password" type="password" required autoComplete="current-password" className={ui.input} />
           </div>
           <button type="submit" className={`${ui.button} w-full`}>Entrar</button>
-          <form action={resetPassword} className="text-center">
-            <input type="hidden" name="email" value="" />
-            <button type="submit" className="text-sm text-blue-700 underline dark:text-blue-400">¿Olvidaste la contraseña?</button>
-          </form>
         </form>
       )}
 
@@ -82,25 +81,30 @@ export function LoginTabs({
         </form>
       )}
 
-      {tab === "codigo" && !check && (
-        <form action={sendCode} className={`${ui.card} space-y-4`}>
+      {tab === "recuperar" && !check && (
+        <form action={requestResetCode} className={`${ui.card} space-y-4`}>
+          <p className="text-sm text-slate-700 dark:text-slate-300">Te enviaremos un código de recuperación a tu correo.</p>
           <div>
             <label htmlFor="email3" className={ui.label}>Correo electrónico</label>
             <input id="email3" name="email" type="email" required autoComplete="email" className={ui.input} />
           </div>
-          <button type="submit" className={`${ui.button} w-full`}>Enviarme un código</button>
+          <button type="submit" className={`${ui.button} w-full`}>Enviar código</button>
         </form>
       )}
 
-      {tab === "codigo" && check && (
-        <form action={verifyCode} className={`${ui.card} space-y-4`}>
-          <p className="text-sm text-slate-700 dark:text-slate-300">Escribe el código de 6 cifras que enviamos a <strong>{check}</strong>.</p>
+      {tab === "recuperar" && check && (
+        <form action={setNewPassword} className={`${ui.card} space-y-4`}>
+          <p className="text-sm text-slate-700 dark:text-slate-300">Escribe el código que llegó a <strong>{check}</strong> y elige una contraseña nueva.</p>
           <input type="hidden" name="email" value={check} />
           <div>
             <label htmlFor="token" className={ui.label}>Código</label>
-            <input id="token" name="token" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required autoComplete="one-time-code" className={`${ui.input} text-center text-2xl tracking-widest`} />
+            <input id="token" name="token" required autoComplete="one-time-code" className={`${ui.input} text-center text-xl tracking-widest`} />
           </div>
-          <button type="submit" className={`${ui.button} w-full`}>Confirmar</button>
+          <div>
+            <label htmlFor="password3" className={ui.label}>Nueva contraseña (mínimo 8 caracteres)</label>
+            <input id="password3" name="password" type="password" required minLength={8} autoComplete="new-password" className={ui.input} />
+          </div>
+          <button type="submit" className={`${ui.button} w-full`}>Guardar contraseña</button>
         </form>
       )}
     </div>

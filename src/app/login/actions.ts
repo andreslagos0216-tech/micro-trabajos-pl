@@ -21,46 +21,36 @@ export async function signUpWithPassword(formData: FormData) {
 
   if (password.length < 8) redirect("/login?error=corta&tab=registro");
 
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: { emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback` },
-  });
+  const { error } = await supabase.auth.signUp({ email, password });
   if (error) redirect("/login?error=registro&tab=registro");
 
-  redirect(`/login?check=${encodeURIComponent(email)}&tab=codigo`);
+  // Si Supabase requiere confirmar el correo, el usuario verá el aviso en la página
+  redirect("/login?tab=entrar&created=1");
 }
 
-export async function sendCode(formData: FormData) {
+export async function requestResetCode(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: { shouldCreateUser: true },
-  });
-  if (error) redirect("/login?error=codigo");
+  const { error } = await supabase.auth.resetPasswordForEmail(email);
+  if (error) redirect("/login?tab=recuperar&error=codigo");
 
-  redirect(`/login?check=${encodeURIComponent(email)}&tab=codigo`);
+  redirect(`/login?tab=recuperar&check=${encodeURIComponent(email)}`);
 }
 
-export async function verifyCode(formData: FormData) {
+export async function setNewPassword(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const token = String(formData.get("token") ?? "").replace(/\s/g, "");
+  const password = String(formData.get("password") ?? "");
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.verifyOtp({ email, token, type: "email" });
-  if (error) redirect(`/login?check=${encodeURIComponent(email)}&tab=codigo&error=codigo_no_valido`);
+  if (password.length < 8) redirect(`/login?tab=recuperar&check=${encodeURIComponent(email)}&error=corta`);
 
-  redirect("/");
-}
+  const { error: verifyError } = await supabase.auth.verifyOtp({ email, token, type: "recovery" });
+  if (verifyError) redirect(`/login?tab=recuperar&check=${encodeURIComponent(email)}&error=codigo_no_valido`);
 
-export async function resetPassword(formData: FormData) {
-  const email = String(formData.get("email") ?? "").trim();
-  const supabase = await createClient();
+  const { error: updateError } = await supabase.auth.updateUser({ password });
+  if (updateError) redirect(`/login?tab=recuperar&check=${encodeURIComponent(email)}&error=codigo_no_valido`);
 
-  await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?next=/perfil`,
-  });
-  redirect("/login?reset=1");
+  redirect("/perfil");
 }
