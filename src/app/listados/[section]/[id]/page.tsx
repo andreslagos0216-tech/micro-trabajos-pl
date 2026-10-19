@@ -15,6 +15,7 @@ import { ownerText } from "@/lib/owner-i18n";
 import { ui } from "@/lib/ui";
 import { listingMetadata } from "@/lib/seo";
 import { ReportForm } from "@/components/report-form";
+import { ContactBlock } from "@/components/contact-block";
 import { PhotoUploader } from "@/components/photo-uploader";
 import { startListingFeatured } from "./actions";
 import { setListingStatus, deleteListing } from "./owner-actions";
@@ -272,6 +273,15 @@ async function ListingDetail({ params, searchParams }: { params: Params; searchP
         )}
       </article>
 
+      <div className="mt-6">
+        <ContactBlock
+          lang={lang}
+          authorId={item.author_id}
+          title={local.title}
+          contactMethod={item.contact_method ?? "chat"}
+          viewerId={user?.id ?? null}
+        />
+      </div>
       {!isOwner && (
         <div className="mt-6">
           {user ? (

@@ -47,7 +47,7 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
 
   const { data: job } = await supabase
     .from("job_posts")
-    .select("id, title, description, pay_pln, pay_agreed, pay_type, status, featured_until, author_id, kind, original_lang, availability, languages, localities(name), categories(name, slug)")
+    .select("id, title, description, pay_pln, pay_agreed, pay_type, status, featured_until, author_id, kind, original_lang, availability, languages, localities(name), categories(name, slug), contact_method")
     .eq("id", id)
     .single();
 
@@ -159,7 +159,7 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
           jobId={job.id}
           authorId={job.author_id}
           title={local.title}
-          status={job.status}
+          status={job.status} contactMethod={job.contact_method}
           viewerId={user?.id ?? null}
         />
       </div>

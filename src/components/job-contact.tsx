@@ -1,9 +1,8 @@
-import Link from "next/link";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { setJobStatus } from "@/app/jobs/[id]/status-actions";
 import { detailText } from "@/lib/detail-i18n";
 import type { Lang } from "@/lib/i18n";
 import { ui } from "@/lib/ui";
+import { ContactBlock } from "@/components/contact-block";
 
 type Props = {
   lang: Lang;
@@ -12,9 +11,10 @@ type Props = {
   title: string;
   status: string;
   viewerId: string | null;
+  contactMethod?: string | null;
 };
 
-export async function JobContact({ lang, jobId, authorId, title, status, viewerId }: Props) {
+export async function JobContact({ lang, jobId, authorId, title, status, viewerId, contactMethod }: Props) {
   const t = detailText[lang];
 
   if (viewerId === authorId) {
@@ -39,34 +39,13 @@ export async function JobContact({ lang, jobId, authorId, title, status, viewerI
     );
   }
 
-  if (!viewerId) {
-    return (
-      <p className="text-sm">
-        <Link href="/login" className={ui.link}>{t.loginToContact}</Link>
-      </p>
-    );
-  }
-
-  const admin = createAdminClient();
-  const { data: contact } = await admin
-    .from("profile_contacts")
-    .select("phone")
-    .eq("profile_id", authorId)
-    .maybeSingle();
-
-  const digits = (contact?.phone ?? "").replace(/\D/g, "");
-  const number = digits.length === 9 ? `48${digits}` : digits;
-  if (!number) return <p className={ui.muted}>{t.noPhone}</p>;
-
-  const text = encodeURIComponent(`${t.whatsappText} ${title}`);
   return (
-    <a
-      href={`https://wa.me/${number}?text=${text}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={ui.button}
-    >
-      {t.whatsapp}
-    </a>
+    <ContactBlock
+      lang={lang}
+      authorId={authorId}
+      title={title}
+      contactMethod={contactMethod ?? "chat"}
+      viewerId={viewerId}
+    />
   );
 }
