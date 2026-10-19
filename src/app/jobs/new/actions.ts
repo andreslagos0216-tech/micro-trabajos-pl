@@ -15,6 +15,7 @@ export async function createJob(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+  if (!user.email_confirmed_at) throw new Error("Confirma tu correo antes de publicar.");
 
   const kind = String(formData.get("kind"));
   const originalLang = String(formData.get("original_lang"));

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
+import { ConfirmGate } from "@/components/confirm-gate";
 import { InstallBanner } from "@/components/install-banner";
 import { SwRegister } from "@/components/sw-register";
 import "./globals.css";
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="flex min-h-screen flex-col">
         <Suspense fallback={<div className="h-16 border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900" />}>
           <SiteHeader />
+        <ConfirmGate />
         </Suspense>
 
         <div className="flex-1">{children}</div>
