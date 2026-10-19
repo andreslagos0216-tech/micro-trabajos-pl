@@ -339,10 +339,12 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
                     >
                       {c.title}
                     </Link>
-                    <p className={`mt-1 ${ui.muted}`}>
-                      {c.city}
-                      {" · "}
+                    <p className="mt-1 text-sm font-bold text-slate-900 dark:text-slate-50">
                       {c.agreed || c.price == null ? h.agreed : `${c.price} zł${c.unit ? ` / ${c.unit}` : ""}`}
+                      {c.kind === "sale" && c.agreed && c.price != null && <> · {h.negotiable}</>}
+                    </p>
+                    <p className={`mt-0.5 text-xs ${ui.muted}`}>
+                      {c.city}
                       {c.distance != null && <> · {formatKm(c.distance)}</>}
                     </p>
                   </div>
