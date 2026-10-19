@@ -6,12 +6,11 @@ import { dict, getLang, type Lang } from "@/lib/i18n";
 import { kindDict, type Kind } from "@/lib/i18n-kinds";
 import { homeText } from "@/lib/home-i18n";
 import { listingsText } from "@/lib/listings-i18n";
-import { formText } from "@/lib/form-i18n";
+import { tipsText } from "@/lib/tips-i18n";
 import { boundingBox, distanceKm, formatKm, parseNear } from "@/lib/geo";
 import { listHref } from "@/lib/url";
 import { ui } from "@/lib/ui";
 import { CategoryTiles, type Tile } from "@/components/category-tiles";
-import { tipsText } from "@/lib/tips-i18n";
 import { LocalityNav } from "@/components/locality-picker";
 
 type SearchParams = Promise<{ q?: string; f?: string; sort?: string; lat?: string; lng?: string; r?: string }>;
@@ -37,6 +36,12 @@ type Filter = (typeof FILTERS)[number];
 const SORTS = ["recent", "price_asc", "price_desc"] as const;
 type Sort = (typeof SORTS)[number];
 
+const FILTER_BUTTON_LABEL: Record<Lang, string> = {
+  pl: "Filtruj i sortuj",
+  es: "Filtrar y ordenar",
+  en: "Filter and sort",
+};
+
 export default function Home(props: { searchParams: SearchParams }) {
   return (
     <Suspense fallback={null}>
@@ -54,7 +59,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   const k = kindDict[lang];
   const h = homeText[lang];
   const l = listingsText[lang];
-  const f = formText[lang];
+  const tips = tipsText[lang];
 
   const sp = await searchParams;
   const q = sp.q?.trim() ?? "";
@@ -222,74 +227,74 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
     price_desc: h.sortPriceDesc,
   };
 
+  const currentFilterValue = filter === "all" ? undefined : filter;
+  const currentSortValue = sort === "recent" ? undefined : sort;
+
   return (
     <main className={ui.container}>
-      <section className="mb-6">
-        <h1 className={ui.title}>{t.heroTitle}</h1>
-        <p className={`mt-2 max-w-2xl ${ui.subtitle}`}>{t.heroSubtitle}</p>
-      </section>
+      <CategoryTiles tiles={tiles} />
 
-      <section className="mb-8 grid gap-3 sm:grid-cols-2">
-        {tipsText[lang].items.map((tip) => (
-          <div key={tip.title} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-            <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">{tip.title}</p>
-            <p className={`mt-1 text-sm ${ui.muted}`}>{tip.text}</p>
-          </div>
+      <div className="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
+        {FILTERS.map((value) => (
+          <Link
+            key={value}
+            href={linkFor({ f: value === "all" ? undefined : value, sort: currentSortValue })}
+            className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold ${
+              filter === value
+                ? "bg-blue-700 text-white"
+                : "border border-slate-300 bg-white text-slate-700 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200"
+            }`}
+          >
+            {h.filters[value]}
+          </Link>
         ))}
-      </section>
+      </div>
 
-      <section id="todos" className="scroll-mt-28">
-        <CategoryTiles tiles={tiles} />
-        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+      <details className="mb-6 rounded-xl border border-slate-200 bg-white p-3 text-sm dark:border-slate-700 dark:bg-slate-900">
+        <summary className="cursor-pointer list-none font-semibold text-slate-800 dark:text-slate-100 [&::-webkit-details-marker]:hidden">
+          {FILTER_BUTTON_LABEL[lang]} ▾
+        </summary>
+
+        <div className="mt-4 space-y-4">
+          <div>
+            <p className={`mb-2 text-xs font-semibold uppercase tracking-wide ${ui.muted}`}>{h.sortLabel}</p>
+            <div className="flex flex-wrap gap-2">
+              {SORTS.map((value) => (
+                <Link
+                  key={value}
+                  href={linkFor({ f: currentFilterValue, sort: value === "recent" ? undefined : value })}
+                  className={sort === value ? ui.button : ui.buttonSecondary}
+                >
+                  {sortLabel[value]}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className={`mb-2 text-xs font-semibold uppercase tracking-wide ${ui.muted}`}>📍 {l.nearLabel}</p>
+            <LocalityNav
+              basePath={linkFor({ f: currentFilterValue, sort: currentSortValue })}
+              label=""
+              placeholder={l.nearPlaceholder}
+              noResults={t.localityNoResults}
+              radius={near?.radius ?? 20}
+            />
+            {near && (
+              <p className={`mt-2 text-xs ${ui.muted}`}>
+                {l.nearSearching} {near.radius} km ·{" "}
+                <Link href={linkFor({ f: currentFilterValue })} className={ui.link}>{l.clearNear}</Link>
+              </p>
+            )}
+          </div>
+        </div>
+      </details>
+
+      <section id="para-ti" className="scroll-mt-28">
+        <div className="mb-4 flex items-end justify-between gap-3">
           <h2 className={ui.sectionTitle}>{h.forYou}</h2>
           <p className={`text-sm ${ui.muted}`}>{visible.length}</p>
         </div>
-
-        <div className="mb-4 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
-          {FILTERS.map((value) => (
-            <Link
-              key={value}
-              href={linkFor({ f: value === "all" ? undefined : value, sort: sort === "recent" ? undefined : sort })}
-              className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold ${
-                filter === value
-                  ? "bg-blue-700 text-white"
-                  : "border border-slate-300 bg-white text-slate-700 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200"
-              }`}
-            >
-              {h.filters[value]}
-            </Link>
-          ))}
-        </div>
-
-        <div className="mb-6 flex flex-wrap items-center gap-2 text-sm">
-          <span className={ui.muted}>{h.sortLabel}:</span>
-          {SORTS.map((value) => (
-            <Link
-              key={value}
-              href={linkFor({ f: filter === "all" ? undefined : filter, sort: value === "recent" ? undefined : value })}
-              className={sort === value ? ui.button : ui.buttonSecondary}
-            >
-              {sortLabel[value]}
-            </Link>
-          ))}
-        </div>
-
-        <div className="mb-6">
-          <LocalityNav
-            basePath={linkFor({ f: filter === "all" ? undefined : filter, sort: sort === "recent" ? undefined : sort })}
-            label={`📍 ${l.nearLabel}`}
-            placeholder={l.nearPlaceholder}
-            noResults={f.categoryNoResults}
-            radius={near?.radius ?? 20}
-          />
-        </div>
-
-        {near && (
-          <p className={`mb-4 text-sm ${ui.muted}`}>
-            {l.nearSearching} {near.radius} km ·{" "}
-            <Link href={linkFor({ f: filter === "all" ? undefined : filter })} className={ui.link}>{l.clearNear}</Link>
-          </p>
-        )}
 
         {visible.length === 0 ? (
           <p className={ui.emptyBox}>{h.emptyFeed}</p>
@@ -317,6 +322,18 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
             ))}
           </ul>
         )}
+      </section>
+
+      <section className="mt-10">
+        <h2 className={`mb-3 ${ui.sectionTitle}`}>{tips.title}</h2>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {tips.items.map((tip) => (
+            <div key={tip.title} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+              <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">{tip.title}</p>
+              <p className={`mt-1 text-sm ${ui.muted}`}>{tip.text}</p>
+            </div>
+          ))}
+        </div>
       </section>
     </main>
   );
