@@ -24,6 +24,7 @@ export async function createListing(formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
   if (!user.email_confirmed_at) throw new Error("Confirma tu correo antes de publicar.");
+  if (!user.email_confirmed_at) throw new Error("Confirma tu correo antes de publicar.");
 
   const categoryId = Number(formData.get("category_id"));
   const localityId = Number(formData.get("locality_id"));

@@ -5,7 +5,6 @@ import { ConfirmGate } from "@/components/confirm-gate";
 import { InstallBanner } from "@/components/install-banner";
 import { SwRegister } from "@/components/sw-register";
 import "./globals.css";
-
 export const metadata: Metadata = {
   title: { default: "TaskGo: anuncios y empleo en Polonia", template: "%s · TaskGo" },
   description: "Ogłoszenia o pracy i usługach w Polsce. Praca dorywcza, na godziny i usługi między osobami prywatnymi.",
@@ -20,13 +19,11 @@ export const metadata: Metadata = {
     apple: "/icons/apple-touch-icon.png",
   },
 };
-
 export const viewport: Viewport = {
   themeColor: "#1d4ed8",
   width: "device-width",
   initialScale: 1,
 };
-
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pl">
@@ -35,13 +32,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <SiteHeader />
         <ConfirmGate />
         </Suspense>
-
         <div className="flex-1">{children}</div>
-
         <Suspense fallback={null}>
           <SiteFooter />
         </Suspense>
-
         <SwRegister />
         <InstallBanner />
       </body>
