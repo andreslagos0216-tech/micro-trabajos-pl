@@ -38,6 +38,7 @@ async function ProfileContent({ searchParams }: { searchParams: SearchParams }) 
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+  const isAdmin = !!process.env.ADMIN_EMAIL && user.email === process.env.ADMIN_EMAIL;
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -142,6 +143,7 @@ async function ProfileContent({ searchParams }: { searchParams: SearchParams }) 
         )}
       </section>
       <section className={`${ui.card} space-y-3`}>
+        {isAdmin && <Link href="/admin" className={ui.buttonSecondary}>Panel de administración</Link>}
         <h2 className={ui.sectionTitle}>{t.session}</h2>
         <form action={signOut}>
           <button type="submit" className={ui.buttonSecondary}>{t.logout}</button>

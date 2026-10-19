@@ -13,6 +13,8 @@ import { ui } from "@/lib/ui";
 import { ReportForm } from "@/components/report-form";
 import { JobContact } from "@/components/job-contact";
 import { startFeaturedCheckout } from "./actions";
+import { deleteJob } from "./owner-actions";
+import { ownerText } from "@/lib/owner-i18n";
 
 type Params = Promise<{ id: string }>;
 type SearchParams = Promise<{ reported?: string }>;
@@ -142,6 +144,11 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
               </form>
             )}
           </section>
+        )}
+        {isOwner && (
+          <form action={deleteJob.bind(null, job.id)} className="pt-2">
+            <button type="submit" className="rounded-md border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-300">{ownerText[lang].delete}</button>
+          </form>
         )}
       </article>
 

@@ -54,12 +54,14 @@ export async function SiteHeader() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const isAdmin = !!user && !!process.env.ADMIN_EMAIL && user.email === process.env.ADMIN_EMAIL;
   const links = [
     { href: "/", label: t.navOffers },
     { href: "/listados/sale", label: t.navSale },
     { href: "/listados/rent", label: t.navRent },
     { href: "/mapa", label: g.navMap },
     { href: user ? "/perfil" : "/login", label: user ? p.navProfile : t.navLogin },
+    ...(isAdmin ? [{ href: "/admin", label: "Administración" }] : []),
   ];
 
   return (
