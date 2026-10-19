@@ -150,7 +150,9 @@ export type Database = {
           bumped_at: string
           category_id: number
           city_id: number | null
+          contact_method: string
           created_at: string
+          custom_category: string | null
           description: string
           featured_until: string | null
           id: string
@@ -172,7 +174,9 @@ export type Database = {
           bumped_at?: string
           category_id: number
           city_id?: number | null
+          contact_method?: string
           created_at?: string
+          custom_category?: string | null
           description: string
           featured_until?: string | null
           id?: string
@@ -194,7 +198,9 @@ export type Database = {
           bumped_at?: string
           category_id?: number
           city_id?: number | null
+          contact_method?: string
           created_at?: string
+          custom_category?: string | null
           description?: string
           featured_until?: string | null
           id?: string
@@ -534,7 +540,9 @@ export type Database = {
           bills_included: boolean | null
           bumped_at: string
           category_id: number
+          contact_method: string
           created_at: string
+          custom_category: string | null
           deposit_pln: number | null
           description: string
           featured_until: string | null
@@ -556,7 +564,9 @@ export type Database = {
           bills_included?: boolean | null
           bumped_at?: string
           category_id: number
+          contact_method?: string
           created_at?: string
+          custom_category?: string | null
           deposit_pln?: number | null
           description: string
           featured_until?: string | null
@@ -578,7 +588,9 @@ export type Database = {
           bills_included?: boolean | null
           bumped_at?: string
           category_id?: number
+          contact_method?: string
           created_at?: string
+          custom_category?: string | null
           deposit_pln?: number | null
           description?: string
           featured_until?: string | null
@@ -741,7 +753,9 @@ export type Database = {
           bumped_at: string
           category_id: number
           condition: string | null
+          contact_method: string
           created_at: string
+          custom_category: string | null
           description: string
           featured_until: string | null
           id: string
@@ -760,7 +774,9 @@ export type Database = {
           bumped_at?: string
           category_id: number
           condition?: string | null
+          contact_method?: string
           created_at?: string
+          custom_category?: string | null
           description: string
           featured_until?: string | null
           id?: string
@@ -779,7 +795,9 @@ export type Database = {
           bumped_at?: string
           category_id?: number
           condition?: string | null
+          contact_method?: string
           created_at?: string
+          custom_category?: string | null
           description?: string
           featured_until?: string | null
           id?: string

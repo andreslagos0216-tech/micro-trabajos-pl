@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { getLang } from "@/lib/i18n";
 import { kindDict } from "@/lib/i18n-kinds";
 import { listingsText } from "@/lib/listings-i18n";
+import { formText } from "@/lib/form-i18n";
 import { ui } from "@/lib/ui";
 
 export default function PublishChooser() {
@@ -21,10 +22,11 @@ async function Chooser() {
   const lang = await getLang();
   const k = kindDict[lang];
   const l = listingsText[lang];
+  const f = formText[lang];
 
   const options = [
     { href: "/jobs/new?kind=job", title: k.job.badge, text: k.job.formSubtitle, icon: "💼" },
-    { href: "/jobs/new?kind=candidate", title: k.candidate.badge, text: k.candidate.formSubtitle, icon: "🔍" },
+    { href: "/?k=job#ofertas", title: f.searchJobsTitle, text: f.searchJobsText, icon: "🔎" },
     { href: "/jobs/new?kind=service", title: k.service.badge, text: k.service.formSubtitle, icon: "🛠️" },
     { href: "/publicar/sale", title: l.sale, text: l.saleSubtitle, icon: "🛒" },
     { href: "/publicar/rent", title: l.rent, text: l.rentSubtitle, icon: "🏠" },
