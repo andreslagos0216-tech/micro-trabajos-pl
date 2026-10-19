@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
+import { createClient } from "@/lib/supabase/server";
 import { dict, getLang, type Lang } from "@/lib/i18n";
 import { homeText } from "@/lib/home-i18n";
 import { ui } from "@/lib/ui";
@@ -10,6 +11,12 @@ const attribution: Record<Lang, string> = {
   pl: "Dane o miejscowościach: GeoNames (CC BY 4.0)",
   es: "Datos de localidades: GeoNames (CC BY 4.0)",
   en: "Place data: GeoNames (CC BY 4.0)",
+};
+
+const accountLabel: Record<Lang, { profile: string; login: string; admin: string }> = {
+  pl: { profile: "Profil", login: "Zaloguj", admin: "Admin" },
+  es: { profile: "Perfil", login: "Entrar", admin: "Admin" },
+  en: { profile: "Profile", login: "Log in", admin: "Admin" },
 };
 
 function LangDropdown({ current }: { current: Lang }) {
@@ -45,6 +52,14 @@ export async function SiteHeader() {
   const lang = await getLang();
   const t = dict[lang];
   const h = homeText[lang];
+  const a = accountLabel[lang];
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const isAdmin = !!user && !!process.env.ADMIN_EMAIL && user.email === process.env.ADMIN_EMAIL;
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
@@ -62,6 +77,17 @@ export async function SiteHeader() {
           />
         </form>
         <div className="ml-auto flex items-center gap-2">
+          {isAdmin && (
+            <Link href="/admin" className="rounded-md border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800">
+              {a.admin}
+            </Link>
+          )}
+          <Link
+            href={user ? "/perfil" : "/login"}
+            className="rounded-md border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
+          >
+            {user ? a.profile : a.login}
+          </Link>
           <LangDropdown current={lang} />
           <Link href="/publicar" className={ui.button}>+ {t.navPublish}</Link>
         </div>
