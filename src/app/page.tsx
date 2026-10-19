@@ -10,7 +10,8 @@ import { formText } from "@/lib/form-i18n";
 import { boundingBox, distanceKm, formatKm, parseNear } from "@/lib/geo";
 import { listHref } from "@/lib/url";
 import { ui } from "@/lib/ui";
-import { SectionFinder, type Tile } from "@/components/section-finder";
+import { CategoryTiles, type Tile } from "@/components/category-tiles";
+import { tipsText } from "@/lib/tips-i18n";
 import { LocalityNav } from "@/components/locality-picker";
 
 type SearchParams = Promise<{ q?: string; f?: string; sort?: string; lat?: string; lng?: string; r?: string }>;
@@ -228,13 +229,19 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
         <p className={`mt-2 max-w-2xl ${ui.subtitle}`}>{t.heroSubtitle}</p>
       </section>
 
-      <section className="mb-8">
-        <SectionFinder placeholder={h.searchPlaceholder} empty={h.searchEmpty} tiles={tiles} />
+      <section className="mb-8 grid gap-3 sm:grid-cols-2">
+        {tipsText[lang].items.map((tip) => (
+          <div key={tip.title} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+            <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">{tip.title}</p>
+            <p className={`mt-1 text-sm ${ui.muted}`}>{tip.text}</p>
+          </div>
+        ))}
       </section>
 
       <section id="todos" className="scroll-mt-28">
+        <CategoryTiles tiles={tiles} />
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-          <h2 className={ui.sectionTitle}>{h.feedTitle}</h2>
+          <h2 className={ui.sectionTitle}>{h.forYou}</h2>
           <p className={`text-sm ${ui.muted}`}>{visible.length}</p>
         </div>
 

@@ -6,6 +6,7 @@ export type HomeDict = {
   searchPlaceholder: string;
   searchEmpty: string;
   feedTitle: string;
+  forYou: string;
   sortLabel: string;
   sortRecent: string;
   sortPriceAsc: string;
@@ -23,6 +24,7 @@ export const homeText: Record<Lang, HomeDict> = {
     searchPlaceholder: "Czego szukasz? Np. sprzątanie, rower, mieszkanie, tłumacz...",
     searchEmpty: "Nie znaleziono. Przewiń w dół, aby zobaczyć wszystkie ogłoszenia.",
     feedTitle: "Wszystkie ogłoszenia",
+    forYou: "Dla Ciebie",
     sortLabel: "Sortuj",
     sortRecent: "Najnowsze",
     sortPriceAsc: "Cena: od najniższej",
@@ -45,6 +47,7 @@ export const homeText: Record<Lang, HomeDict> = {
     searchPlaceholder: "¿Qué buscas? Ej.: limpieza, bicicleta, piso, traductor...",
     searchEmpty: "No encontramos nada. Desplázate para ver todos los anuncios.",
     feedTitle: "Todos los anuncios",
+    forYou: "Para ti",
     sortLabel: "Ordenar",
     sortRecent: "Más recientes",
     sortPriceAsc: "Precio: de menor a mayor",
@@ -67,6 +70,7 @@ export const homeText: Record<Lang, HomeDict> = {
     searchPlaceholder: "What are you looking for? E.g. cleaning, bicycle, flat, translator...",
     searchEmpty: "Nothing found. Scroll down to see all listings.",
     feedTitle: "All listings",
+    forYou: "For you",
     sortLabel: "Sort",
     sortRecent: "Newest",
     sortPriceAsc: "Price: low to high",
