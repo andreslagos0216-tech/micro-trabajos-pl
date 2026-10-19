@@ -17,6 +17,7 @@ export async function updateProfile(formData: FormData) {
   const bio = String(formData.get("bio") ?? "").trim().slice(0, 500);
   const languages = formData.getAll("languages").map(String).filter((l) => LANGS.includes(l));
   const localityRaw = String(formData.get("locality_id") ?? "");
+  const showPhone = formData.get("show_phone") === "on";
 
   const { error } = await supabase
     .from("profiles")
@@ -24,6 +25,7 @@ export async function updateProfile(formData: FormData) {
       full_name: fullName || null,
       bio: bio || null,
       languages,
+      show_phone: showPhone,
       ...(localityRaw ? { locality_id: Number(localityRaw) } : {}),
     })
     .eq("id", user.id);

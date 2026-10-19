@@ -510,6 +510,7 @@ export type Database = {
           is_verified: boolean
           languages: string[]
           locality_id: number | null
+          show_phone: boolean
         }
         Insert: {
           bio?: string | null
@@ -520,6 +521,7 @@ export type Database = {
           is_verified?: boolean
           languages?: string[]
           locality_id?: number | null
+          show_phone?: boolean
         }
         Update: {
           bio?: string | null
@@ -530,6 +532,7 @@ export type Database = {
           is_verified?: boolean
           languages?: string[]
           locality_id?: number | null
+          show_phone?: boolean
         }
         Relationships: [
           {

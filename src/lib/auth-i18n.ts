@@ -17,7 +17,7 @@ const pl = {
   recoverCheck: "Wpisz kod, który przyszedł na adres",
   codeLabel: "Kod",
   save: "Zapisz nowe hasło",
-  created: "Konto utworzone. Możesz się teraz zalogować.",
+  created: "Konto utworzone. Potwierdź adres e-mail, a następnie zaloguj się.",
   detail: "Szczegóły:",
   errors: {
     credentials: "Nieprawidłowy e-mail lub hasło.",
@@ -48,7 +48,7 @@ const es: AuthDict = {
   recoverCheck: "Escribe el código que llegó a",
   codeLabel: "Código",
   save: "Guardar contraseña nueva",
-  created: "Cuenta creada. Ya puedes entrar.",
+  created: "Cuenta creada. Confirma tu correo y luego entra.",
   detail: "Detalle:",
   errors: {
     credentials: "Correo o contraseña incorrectos.",
@@ -77,7 +77,7 @@ const en: AuthDict = {
   recoverCheck: "Enter the code sent to",
   codeLabel: "Code",
   save: "Save new password",
-  created: "Account created. You can log in now.",
+  created: "Account created. Confirm your email, then log in.",
   detail: "Details:",
   errors: {
     credentials: "Incorrect email or password.",
