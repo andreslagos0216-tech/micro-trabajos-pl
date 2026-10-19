@@ -13,6 +13,7 @@ import { localizeMany } from "@/lib/translate";
 type ListingTable = "sale_listings" | "rental_listings";
 import { ownerText } from "@/lib/owner-i18n";
 import { ui } from "@/lib/ui";
+import { listingMetadata } from "@/lib/seo";
 import { ReportForm } from "@/components/report-form";
 import { PhotoUploader } from "@/components/photo-uploader";
 import { startListingFeatured } from "./actions";
@@ -289,4 +290,28 @@ async function ListingDetail({ params, searchParams }: { params: Params; searchP
       )}
     </>
   );
+}
+
+
+export async function generateMetadata({ params }: { params: Promise<{ section: string; id: string }> }) {
+  const { section, id } = await params;
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return {};
+  const { createClient } = await import("@/lib/supabase/server");
+  const supabase = await createClient();
+  const table = section === "sale" ? "sale_listings" : "rental_listings";
+  const { data } = await supabase
+    .from(table as "sale_listings")
+    .select("title, description, price_pln, rent_pln, localities(name)")
+    .eq("id", id)
+    .single();
+  if (!data) return {};
+  const row = data as unknown as { title: string; description: string; price_pln: number | null; rent_pln: number | null; localities: { name: string } | null };
+  const price = section === "sale" ? (row.price_pln != null ? `${row.price_pln} zł` : null) : (row.rent_pln != null ? `${row.rent_pln} zł / mies.` : null);
+  return listingMetadata({
+    title: row.title,
+    description: row.description,
+    city: row.localities?.name ?? null,
+    price,
+    path: `/listados/${section}/${id}`,
+  });
 }

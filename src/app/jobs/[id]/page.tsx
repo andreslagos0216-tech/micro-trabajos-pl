@@ -10,6 +10,7 @@ import { localizeJob } from "@/lib/translate";
 import { reportText } from "@/lib/report-i18n";
 import { detailText } from "@/lib/detail-i18n";
 import { ui } from "@/lib/ui";
+import { listingMetadata } from "@/lib/seo";
 import { ReportForm } from "@/components/report-form";
 import { JobContact } from "@/components/job-contact";
 import { startFeaturedCheckout } from "./actions";
@@ -176,4 +177,26 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
       )}
     </>
   );
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return {};
+  const { createClient } = await import("@/lib/supabase/server");
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("job_posts")
+    .select("title, description, pay_pln, pay_agreed, pay_type, localities(name)")
+    .eq("id", id)
+    .single();
+  if (!data) return {};
+  const row = data as unknown as { title: string; description: string; pay_pln: number | null; pay_agreed: boolean; pay_type: string; localities: { name: string } | null };
+  const price = row.pay_agreed || row.pay_pln == null ? "A convenir" : `${row.pay_pln} zł / ${row.pay_type === "hour" ? "h" : "projekt"}`;
+  return listingMetadata({
+    title: row.title,
+    description: row.description,
+    city: row.localities?.name ?? null,
+    price,
+    path: `/jobs/${id}`,
+  });
 }
