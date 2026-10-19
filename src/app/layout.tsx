@@ -6,12 +6,12 @@ import { SwRegister } from "@/components/sw-register";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "TaskGo", template: "%s · TaskGo" },
+  title: { default: "TaskGo: anuncios y empleo en Polonia", template: "%s · TaskGo" },
   description: "Ogłoszenia o pracy i usługach w Polsce. Praca dorywcza, na godziny i usługi między osobami prywatnymi.",
   applicationName: "TaskGo",
   appleWebApp: {
     capable: true,
-    title: "TaskGo",
+    title: "TaskGo: anuncios y empleo en Polonia",
     statusBarStyle: "default",
   },
   icons: {
