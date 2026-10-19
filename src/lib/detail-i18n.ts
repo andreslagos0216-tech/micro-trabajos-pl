@@ -21,7 +21,7 @@ const pl: DetailDict = {
   whatsappText: "Dzień dobry, piszę w sprawie ogłoszenia:",
   noPhone: "Autor nie podał numeru telefonu.",
   loginToContact: "Zaloguj się, aby zobaczyć kontakt.",
-  statusNames: { active: "Aktywne", paused: "Wstrzymane", closed: "Zatrudniono" },
+  statusNames: { active: "Aktywne", paused: "Wstrzymane", closed: "Zatrudniono", pending_review: "W weryfikacji" },
 };
 
 const es: DetailDict = {
@@ -33,7 +33,7 @@ const es: DetailDict = {
   whatsappText: "Hola, escribo por tu anuncio:",
   noPhone: "El autor no ha indicado teléfono.",
   loginToContact: "Inicia sesión para ver el contacto.",
-  statusNames: { active: "Activo", paused: "Pausado", closed: "Cubierta" },
+  statusNames: { active: "Activo", paused: "Pausado", closed: "Cubierta", pending_review: "En revisión" },
 };
 
 const en: DetailDict = {
@@ -45,7 +45,7 @@ const en: DetailDict = {
   whatsappText: "Hello, I'm writing about your listing:",
   noPhone: "The author has not provided a phone number.",
   loginToContact: "Log in to see contact details.",
-  statusNames: { active: "Active", paused: "Paused", closed: "Filled" },
+  statusNames: { active: "Active", paused: "Paused", closed: "Filled", pending_review: "Under review" },
 };
 
 export const detailText: Record<Lang, DetailDict> = { pl, es, en };

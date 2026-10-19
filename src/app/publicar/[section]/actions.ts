@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { reviewStatus } from "@/lib/moderation";
 
 const LANGS = ["pl", "es", "en"];
 const LEVELS = ["basic", "medium", "advanced", "native"];
@@ -42,7 +43,21 @@ export async function createListing(formData: FormData) {
     languages.push({ code, level: LEVELS.includes(level) ? level : "basic" });
   }
 
+  // Solo se aceptan rutas de fotos subidas por este mismo usuario
+  const photoPaths = formData
+    .getAll("photo_path")
+    .map(String)
+    .filter((p) => p.startsWith(`${user.id}/`) && p.endsWith(".jpg") && !p.includes(".."))
+    .slice(0, 8);
+
   const customCategory = String(formData.get("custom_category") ?? "").trim();
+  const title = String(formData.get("title") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+
+  const review = await reviewStatus(supabase, user.id, `${title}\n${description}\n${customCategory}`, {
+    needsPhotos: true,
+    photoCount: photoPaths.length,
+  });
 
   const common = {
     author_id: user.id,
@@ -51,10 +66,12 @@ export async function createListing(formData: FormData) {
     original_lang: originalLang,
     custom_category: customCategory || null,
     contact_method: contact,
-    title: String(formData.get("title") ?? "").trim(),
-    description: String(formData.get("description") ?? "").trim(),
+    title,
+    description,
     lat: loc.lat,
     lng: loc.lng,
+    status: review.status,
+    review_note: review.reasons.join(",") || null,
   };
 
   if (section === "sale") {
@@ -79,8 +96,21 @@ export async function createListing(formData: FormData) {
       })
       .select("id")
       .single();
-
     if (error) throw new Error(error.message);
+
+    if (photoPaths.length) {
+      const { error: photoError } = await supabase.from("listing_photos").insert(
+        photoPaths.map((storage_path, i) => ({
+          author_id: user.id,
+          storage_path,
+          position: i,
+          sale_listing_id: row.id,
+          rental_listing_id: null,
+        }))
+      );
+      if (photoError) throw new Error(photoError.message);
+    }
+
     redirect(`/listados/sale/${row.id}`);
   }
 
@@ -98,7 +128,20 @@ export async function createListing(formData: FormData) {
     })
     .select("id")
     .single();
-
   if (error) throw new Error(error.message);
+
+  if (photoPaths.length) {
+    const { error: photoError } = await supabase.from("listing_photos").insert(
+      photoPaths.map((storage_path, i) => ({
+        author_id: user.id,
+        storage_path,
+        position: i,
+        sale_listing_id: null,
+        rental_listing_id: row.id,
+      }))
+    );
+    if (photoError) throw new Error(photoError.message);
+  }
+
   redirect(`/listados/rent/${row.id}`);
 }

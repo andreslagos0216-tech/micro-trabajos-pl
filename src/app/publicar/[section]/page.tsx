@@ -12,6 +12,7 @@ import { adLangHint, adLangLabel, adLangPlaceholder } from "@/lib/labels";
 import { ui } from "@/lib/ui";
 import { LocalityPicker } from "@/components/locality-picker";
 import { CategoryPicker } from "@/components/category-picker";
+import { PhotoPicker } from "@/components/photo-picker";
 import { createListing } from "./actions";
 
 type Props = {
@@ -167,7 +168,8 @@ async function PublishContent({ params, searchParams }: Props) {
         <div className={`${ui.card} space-y-2 bg-slate-50 dark:bg-slate-800`}>
           <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{t.photosTitle}</p>
           <p className={`text-xs ${ui.muted}`}>{ex.photos}</p>
-          <p className={`text-xs ${ui.muted}`}>{t.photosSaveHint}</p>
+          <p className={`text-xs ${ui.muted}`}></p>
+          <PhotoPicker userId={user.id} lang={lang} />
         </div>
 
         <LocalityPicker

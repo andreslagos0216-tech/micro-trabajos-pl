@@ -2,16 +2,18 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { reviewStatus } from "@/lib/moderation";
 
 const KINDS = ["job", "candidate", "service"];
 const LANGS = ["pl", "es", "en"];
+const LEVELS = ["basic", "medium", "advanced", "native"];
+const CONTACTS = ["chat", "whatsapp", "both"];
 
 export async function createJob(formData: FormData) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
   if (!user) redirect("/login");
 
   const kind = String(formData.get("kind"));
@@ -21,7 +23,13 @@ export async function createJob(formData: FormData) {
   }
 
   const localityId = Number(formData.get("locality_id"));
-  if (!localityId) throw new Error("Selecciona una miejscowość de la lista");
+  if (!localityId) throw new Error("Selecciona una localidad de la lista");
+
+  const categoryId = Number(formData.get("category_id"));
+  if (!categoryId) throw new Error("Selecciona una categoría");
+
+  const contact = String(formData.get("contact_method") ?? "chat");
+  if (!CONTACTS.includes(contact)) throw new Error("Forma de contacto no válida");
 
   const { data: loc } = await supabase
     .from("localities")
@@ -29,7 +37,25 @@ export async function createJob(formData: FormData) {
     .eq("id", localityId)
     .single();
 
+  const languages: { code: string; level: string }[] = [];
+  for (const code of LANGS) {
+    if (formData.get(`lang_${code}`) !== "on") continue;
+    const level = String(formData.get(`level_${code}`) ?? "basic");
+    languages.push({ code, level: LEVELS.includes(level) ? level : "basic" });
+  }
+
   const availability = String(formData.get("availability") ?? "").trim();
+  const customCategory = String(formData.get("custom_category") ?? "").trim();
+  const title = String(formData.get("title") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+
+  const review = await reviewStatus(supabase, user.id, `${title}\n${description}\n${customCategory}`, {
+    needsPhotos: false,
+    photoCount: 0,
+  });
+
+  const payAgreed = formData.get("pay_agreed") === "on";
+  const payRaw = Number(formData.get("pay_pln"));
 
   const { data: job, error } = await supabase
     .from("job_posts")
@@ -38,16 +64,20 @@ export async function createJob(formData: FormData) {
       kind,
       original_lang: originalLang,
       locality_id: localityId,
-      category_id: Number(formData.get("category_id")),
-      title: String(formData.get("title")),
-      description: String(formData.get("description")),
+      category_id: categoryId,
+      custom_category: customCategory || null,
+      title,
+      description,
       pay_type: String(formData.get("pay_type")),
-      pay_pln: formData.get("pay_agreed") === "on" ? null : Number(formData.get("pay_pln")),
-      pay_agreed: formData.get("pay_agreed") === "on",
+      pay_pln: payAgreed ? null : payRaw,
+      pay_agreed: payAgreed,
       availability: availability || null,
-      languages: formData.getAll("languages").map(String),
+      languages,
+      contact_method: contact,
       lat: loc?.lat ?? null,
       lng: loc?.lng ?? null,
+      status: review.status,
+      review_note: review.reasons.join(",") || null,
     })
     .select("id")
     .single();

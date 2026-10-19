@@ -165,7 +165,7 @@ async function ListingDetail({ params }: { params: Params }) {
           <section className="rounded-md border border-slate-200 bg-slate-50 p-4 text-sm dark:border-slate-700 dark:bg-slate-800">
             <p className="font-semibold text-slate-900 dark:text-slate-100">{t.ownerTitle}</p>
             <p className="mt-1 text-slate-700 dark:text-slate-300">
-              {t.statusLabel}: {item.status === "active" ? t.statusActive : t.statusOther}
+              {t.statusLabel}: {(item.status === "active" ? t.statusActive : item.status === "pending_review" ? (lang === "es" ? "En revisión" : lang === "en" ? "Under review" : "W weryfikacji") : t.statusOther)}
             </p>
           </section>
         )}

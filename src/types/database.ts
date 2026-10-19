@@ -157,7 +157,7 @@ export type Database = {
           featured_until: string | null
           id: string
           kind: string
-          languages: string[]
+          languages: Json
           lat: number | null
           lng: number | null
           locality_id: number | null
@@ -165,6 +165,9 @@ export type Database = {
           pay_agreed: boolean
           pay_pln: number | null
           pay_type: string
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
           status: string
           title: string
         }
@@ -181,7 +184,7 @@ export type Database = {
           featured_until?: string | null
           id?: string
           kind?: string
-          languages?: string[]
+          languages?: Json
           lat?: number | null
           lng?: number | null
           locality_id?: number | null
@@ -189,6 +192,9 @@ export type Database = {
           pay_agreed?: boolean
           pay_pln?: number | null
           pay_type: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
           title: string
         }
@@ -205,7 +211,7 @@ export type Database = {
           featured_until?: string | null
           id?: string
           kind?: string
-          languages?: string[]
+          languages?: Json
           lat?: number | null
           lng?: number | null
           locality_id?: number | null
@@ -213,6 +219,9 @@ export type Database = {
           pay_agreed?: boolean
           pay_pln?: number | null
           pay_type?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
           title?: string
         }
@@ -243,6 +252,13 @@ export type Database = {
             columns: ["locality_id"]
             isOneToOne: false
             referencedRelation: "localities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_posts_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -554,6 +570,9 @@ export type Database = {
           locality_id: number | null
           original_lang: string
           rent_pln: number
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
           rooms: number | null
           status: string
           title: string
@@ -579,6 +598,9 @@ export type Database = {
           locality_id?: number | null
           original_lang?: string
           rent_pln: number
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           rooms?: number | null
           status?: string
           title: string
@@ -604,6 +626,9 @@ export type Database = {
           locality_id?: number | null
           original_lang?: string
           rent_pln?: number
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           rooms?: number | null
           status?: string
           title?: string
@@ -628,6 +653,13 @@ export type Database = {
             columns: ["locality_id"]
             isOneToOne: false
             referencedRelation: "localities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rental_listings_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -769,6 +801,9 @@ export type Database = {
           original_lang: string
           price_negotiable: boolean
           price_pln: number
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
           status: string
           title: string
         }
@@ -791,6 +826,9 @@ export type Database = {
           original_lang?: string
           price_negotiable?: boolean
           price_pln: number
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
           title: string
         }
@@ -813,6 +851,9 @@ export type Database = {
           original_lang?: string
           price_negotiable?: boolean
           price_pln?: number
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
           title?: string
         }
@@ -836,6 +877,13 @@ export type Database = {
             columns: ["locality_id"]
             isOneToOne: false
             referencedRelation: "localities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sale_listings_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

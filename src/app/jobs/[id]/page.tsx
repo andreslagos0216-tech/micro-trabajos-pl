@@ -108,11 +108,11 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
                 <dd className="font-medium text-slate-900 dark:text-slate-100">{job.availability}</dd>
               </div>
             )}
-            {job.languages && job.languages.length > 0 && (
+            {Array.isArray(job.languages) && job.languages.length > 0 && (
               <div>
                 <dt className={ui.muted}>{k.spokenLanguages}</dt>
                 <dd className="font-medium text-slate-900 dark:text-slate-100">
-                  {job.languages.map((x: string) => k.langNames[x as Lang] ?? x).join(", ")}
+                  {(job.languages as unknown as { code: string }[]).map((x) => k.langNames[x.code as Lang] ?? x.code).join(", ")}
                 </dd>
               </div>
             )}
