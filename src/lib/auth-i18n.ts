@@ -1,0 +1,92 @@
+import type { Lang } from "@/lib/i18n";
+
+const pl = {
+  title: "Dostęp",
+  subtitle: "Zaloguj się lub załóż konto bez opuszczania tej strony.",
+  tabLogin: "Zaloguj się",
+  tabRegister: "Załóż konto",
+  tabRecover: "Nie pamiętam hasła",
+  email: "Adres e-mail",
+  password: "Hasło",
+  passwordNew: "Hasło (min. 8 znaków)",
+  newPassword: "Nowe hasło (min. 8 znaków)",
+  login: "Zaloguj się",
+  register: "Załóż konto",
+  sendCode: "Wyślij kod",
+  recoverHint: "Wyślemy kod na Twój e-mail. Wpisz go poniżej i ustaw nowe hasło.",
+  recoverCheck: "Wpisz kod, który przyszedł na adres",
+  codeLabel: "Kod",
+  save: "Zapisz nowe hasło",
+  created: "Konto utworzone. Możesz się teraz zalogować.",
+  detail: "Szczegóły:",
+  errors: {
+    credentials: "Nieprawidłowy e-mail lub hasło.",
+    short: "Hasło musi mieć co najmniej 8 znaków.",
+    register: "Nie udało się założyć konta.",
+    code: "Nie udało się wysłać kodu. Spróbuj ponownie za kilka minut.",
+    invalid: "Kod jest nieprawidłowy lub wygasł.",
+    generic: "Wystąpił błąd. Spróbuj ponownie.",
+  },
+};
+
+export type AuthDict = typeof pl;
+
+const es: AuthDict = {
+  title: "Acceso",
+  subtitle: "Entra o crea tu cuenta sin salir de esta página.",
+  tabLogin: "Entrar",
+  tabRegister: "Crear cuenta",
+  tabRecover: "Olvidé mi contraseña",
+  email: "Correo electrónico",
+  password: "Contraseña",
+  passwordNew: "Contraseña (mínimo 8 caracteres)",
+  newPassword: "Nueva contraseña (mínimo 8 caracteres)",
+  login: "Entrar",
+  register: "Crear cuenta",
+  sendCode: "Enviar código",
+  recoverHint: "Te enviaremos un código a tu correo. Escríbelo abajo y elige una contraseña nueva.",
+  recoverCheck: "Escribe el código que llegó a",
+  codeLabel: "Código",
+  save: "Guardar contraseña nueva",
+  created: "Cuenta creada. Ya puedes entrar.",
+  detail: "Detalle:",
+  errors: {
+    credentials: "Correo o contraseña incorrectos.",
+    short: "La contraseña debe tener al menos 8 caracteres.",
+    register: "No se pudo crear la cuenta. Puede que el correo ya exista.",
+    code: "No se pudo enviar el código. Inténtalo de nuevo en unos minutos.",
+    invalid: "El código no es válido o ha caducado.",
+    generic: "Ha ocurrido un error. Inténtalo de nuevo.",
+  },
+};
+
+const en: AuthDict = {
+  title: "Log in",
+  subtitle: "Log in or create your account without leaving this page.",
+  tabLogin: "Log in",
+  tabRegister: "Create account",
+  tabRecover: "Forgot my password",
+  email: "Email address",
+  password: "Password",
+  passwordNew: "Password (min. 8 characters)",
+  newPassword: "New password (min. 8 characters)",
+  login: "Log in",
+  register: "Create account",
+  sendCode: "Send code",
+  recoverHint: "We'll send a code to your email. Enter it below and choose a new password.",
+  recoverCheck: "Enter the code sent to",
+  codeLabel: "Code",
+  save: "Save new password",
+  created: "Account created. You can log in now.",
+  detail: "Details:",
+  errors: {
+    credentials: "Incorrect email or password.",
+    short: "The password must be at least 8 characters.",
+    register: "The account could not be created. The email may already exist.",
+    code: "The code could not be sent. Please try again in a few minutes.",
+    invalid: "The code is invalid or has expired.",
+    generic: "Something went wrong. Please try again.",
+  },
+};
+
+export const authText: Record<Lang, AuthDict> = { pl, es, en };

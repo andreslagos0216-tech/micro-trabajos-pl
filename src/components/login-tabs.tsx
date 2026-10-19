@@ -1,36 +1,38 @@
+import type { Lang } from "@/lib/i18n";
+import { authText } from "@/lib/auth-i18n";
 import { ui } from "@/lib/ui";
 import { signInWithPassword, signUpWithPassword, requestResetCode, setNewPassword } from "@/app/login/actions";
 
 type Tab = "entrar" | "registro" | "recuperar";
 
 export function LoginTabs({
+  lang,
   tab,
   error,
+  msg,
   check,
   created,
 }: {
+  lang: Lang;
   tab: Tab;
   error?: string;
+  msg?: string;
   check?: string;
   created?: boolean;
 }) {
+  const t = authText[lang];
+
   const tabs: { id: Tab; label: string }[] = [
-    { id: "entrar", label: "Entrar" },
-    { id: "registro", label: "Crear cuenta" },
-    { id: "recuperar", label: "Olvidé mi contraseña" },
+    { id: "entrar", label: t.tabLogin },
+    { id: "registro", label: t.tabRegister },
+    { id: "recuperar", label: t.tabRecover },
   ];
 
-  const messages: Record<string, string> = {
-    credenciales: "Correo o contraseña incorrectos.",
-    corta: "La contraseña debe tener al menos 8 caracteres.",
-    registro: "No se pudo crear la cuenta. Puede que el correo ya exista.",
-    codigo: "No se pudo enviar el código. Inténtalo de nuevo en unos minutos.",
-    codigo_no_valido: "El código no es válido o ha caducado. Pide uno nuevo.",
-  };
+  const errorText = error ? (t.errors as Record<string, string>)[error] ?? t.errors.generic : null;
 
   return (
     <div className="space-y-6">
-      <nav className="flex flex-wrap gap-2" aria-label="Acceso">
+      <nav className="flex flex-wrap gap-2" aria-label={t.title}>
         {tabs.map((item) => (
           <a
             key={item.id}
@@ -46,65 +48,73 @@ export function LoginTabs({
         ))}
       </nav>
 
-      {error && messages[error] && <p className={ui.errorBox}>{messages[error]}</p>}
+      {errorText && (
+        <div className={ui.errorBox}>
+          <p>{errorText}</p>
+          {msg && <p className="mt-2 text-xs opacity-80">{t.detail} {msg}</p>}
+        </div>
+      )}
+
       {created && (
         <p className="rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-200">
-          Cuenta creada. Ya puedes entrar con tu correo y contraseña.
+          {t.created}
         </p>
       )}
 
       {tab === "entrar" && (
         <form action={signInWithPassword} className={`${ui.card} space-y-4`}>
           <div>
-            <label htmlFor="email1" className={ui.label}>Correo electrónico</label>
+            <label htmlFor="email1" className={ui.label}>{t.email}</label>
             <input id="email1" name="email" type="email" required autoComplete="email" className={ui.input} />
           </div>
           <div>
-            <label htmlFor="password1" className={ui.label}>Contraseña</label>
+            <label htmlFor="password1" className={ui.label}>{t.password}</label>
             <input id="password1" name="password" type="password" required autoComplete="current-password" className={ui.input} />
           </div>
-          <button type="submit" className={`${ui.button} w-full`}>Entrar</button>
+          <button type="submit" className={`${ui.button} w-full`}>{t.login}</button>
         </form>
       )}
 
       {tab === "registro" && (
         <form action={signUpWithPassword} className={`${ui.card} space-y-4`}>
           <div>
-            <label htmlFor="email2" className={ui.label}>Correo electrónico</label>
+            <label htmlFor="email2" className={ui.label}>{t.email}</label>
             <input id="email2" name="email" type="email" required autoComplete="email" className={ui.input} />
           </div>
           <div>
-            <label htmlFor="password2" className={ui.label}>Contraseña (mínimo 8 caracteres)</label>
+            <label htmlFor="password2" className={ui.label}>{t.passwordNew}</label>
             <input id="password2" name="password" type="password" required minLength={8} autoComplete="new-password" className={ui.input} />
           </div>
-          <button type="submit" className={`${ui.button} w-full`}>Crear cuenta</button>
+          <button type="submit" className={`${ui.button} w-full`}>{t.register}</button>
         </form>
       )}
 
       {tab === "recuperar" && !check && (
         <form action={requestResetCode} className={`${ui.card} space-y-4`}>
-          <p className="text-sm text-slate-700 dark:text-slate-300">Te enviaremos un código de recuperación a tu correo.</p>
+          <p className="text-sm text-slate-700 dark:text-slate-300">{t.recoverHint}</p>
           <div>
-            <label htmlFor="email3" className={ui.label}>Correo electrónico</label>
+            <label htmlFor="email3" className={ui.label}>{t.email}</label>
             <input id="email3" name="email" type="email" required autoComplete="email" className={ui.input} />
           </div>
-          <button type="submit" className={`${ui.button} w-full`}>Enviar código</button>
+          <button type="submit" className={`${ui.button} w-full`}>{t.sendCode}</button>
         </form>
       )}
 
       {tab === "recuperar" && check && (
         <form action={setNewPassword} className={`${ui.card} space-y-4`}>
-          <p className="text-sm text-slate-700 dark:text-slate-300">Escribe el código que llegó a <strong>{check}</strong> y elige una contraseña nueva.</p>
+          <p className="text-sm text-slate-700 dark:text-slate-300">
+            {t.recoverCheck} <strong>{check}</strong>
+          </p>
           <input type="hidden" name="email" value={check} />
           <div>
-            <label htmlFor="token" className={ui.label}>Código</label>
+            <label htmlFor="token" className={ui.label}>{t.codeLabel}</label>
             <input id="token" name="token" required autoComplete="one-time-code" className={`${ui.input} text-center text-xl tracking-widest`} />
           </div>
           <div>
-            <label htmlFor="password3" className={ui.label}>Nueva contraseña (mínimo 8 caracteres)</label>
+            <label htmlFor="password3" className={ui.label}>{t.newPassword}</label>
             <input id="password3" name="password" type="password" required minLength={8} autoComplete="new-password" className={ui.input} />
           </div>
-          <button type="submit" className={`${ui.button} w-full`}>Guardar contraseña</button>
+          <button type="submit" className={`${ui.button} w-full`}>{t.save}</button>
         </form>
       )}
     </div>

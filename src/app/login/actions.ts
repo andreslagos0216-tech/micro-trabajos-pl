@@ -3,54 +3,64 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
+function fail(tab: string, key: string, extra: Record<string, string> = {}): never {
+  const params = new URLSearchParams({ tab, error: key, ...extra });
+  redirect(`/login?${params.toString()}`);
+}
+
+function clean(value: unknown) {
+  return String(value ?? "").trim();
+}
+
 export async function signInWithPassword(formData: FormData) {
-  const email = String(formData.get("email") ?? "").trim();
+  const email = clean(formData.get("email"));
   const password = String(formData.get("password") ?? "");
   const supabase = await createClient();
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) redirect("/login?error=credenciales");
+  if (error) fail("entrar", "credentials", { msg: error.message.slice(0, 200) });
 
   redirect("/");
 }
 
 export async function signUpWithPassword(formData: FormData) {
-  const email = String(formData.get("email") ?? "").trim();
+  const email = clean(formData.get("email"));
   const password = String(formData.get("password") ?? "");
   const supabase = await createClient();
 
-  if (password.length < 8) redirect("/login?error=corta&tab=registro");
+  if (password.length < 8) fail("registro", "short");
 
-  const { error } = await supabase.auth.signUp({ email, password });
-  if (error) redirect("/login?error=registro&tab=registro");
+  const { data, error } = await supabase.auth.signUp({ email, password });
+  if (error) fail("registro", "register", { msg: error.message.slice(0, 200) });
 
-  // Si Supabase requiere confirmar el correo, el usuario verá el aviso en la página
+  if (data.session) redirect("/");
   redirect("/login?tab=entrar&created=1");
 }
 
 export async function requestResetCode(formData: FormData) {
-  const email = String(formData.get("email") ?? "").trim();
+  const email = clean(formData.get("email"));
   const supabase = await createClient();
 
   const { error } = await supabase.auth.resetPasswordForEmail(email);
-  if (error) redirect("/login?tab=recuperar&error=codigo");
+  if (error) fail("recuperar", "code", { msg: error.message.slice(0, 200) });
 
   redirect(`/login?tab=recuperar&check=${encodeURIComponent(email)}`);
 }
 
 export async function setNewPassword(formData: FormData) {
-  const email = String(formData.get("email") ?? "").trim();
-  const token = String(formData.get("token") ?? "").replace(/\s/g, "");
+  const email = clean(formData.get("email"));
+  const token = clean(formData.get("token")).replace(/\s/g, "");
   const password = String(formData.get("password") ?? "");
   const supabase = await createClient();
+  const back = { check: email };
 
-  if (password.length < 8) redirect(`/login?tab=recuperar&check=${encodeURIComponent(email)}&error=corta`);
+  if (password.length < 8) fail("recuperar", "short", back);
 
   const { error: verifyError } = await supabase.auth.verifyOtp({ email, token, type: "recovery" });
-  if (verifyError) redirect(`/login?tab=recuperar&check=${encodeURIComponent(email)}&error=codigo_no_valido`);
+  if (verifyError) fail("recuperar", "invalid", { ...back, msg: verifyError.message.slice(0, 200) });
 
   const { error: updateError } = await supabase.auth.updateUser({ password });
-  if (updateError) redirect(`/login?tab=recuperar&check=${encodeURIComponent(email)}&error=codigo_no_valido`);
+  if (updateError) fail("recuperar", "invalid", { ...back, msg: updateError.message.slice(0, 200) });
 
   redirect("/perfil");
 }
