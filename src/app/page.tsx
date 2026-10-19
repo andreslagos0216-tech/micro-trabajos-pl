@@ -12,6 +12,7 @@ import { listHref } from "@/lib/url";
 import { ui } from "@/lib/ui";
 import { CategoryTiles, type Tile } from "@/components/category-tiles";
 import { LocalityNav } from "@/components/locality-picker";
+import { ListingThumb } from "@/components/listing-thumb";
 
 type SearchParams = Promise<{ q?: string; f?: string; sort?: string; lat?: string; lng?: string; r?: string }>;
 
@@ -29,6 +30,7 @@ type Card = {
   bumped_at: string;
   href: string;
   badge: string;
+  photo: string | null;
 };
 
 const FILTERS = ["all", "job", "service", "candidate", "sale", "rent"] as const;
@@ -127,6 +129,25 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
 
   const cards: Card[] = [];
 
+  // Primera foto de cada anuncio, en una sola consulta
+  const saleIds = (salesRes.data ?? []).map((x) => (x as { id: string }).id);
+  const rentIds = (rentsRes.data ?? []).map((x) => (x as { id: string }).id);
+  const { data: firstPhotos } = await supabase
+    .from("listing_photos")
+    .select("sale_listing_id, rental_listing_id, storage_path, position")
+    .or(`sale_listing_id.in.(${saleIds.join(",") || "00000000-0000-0000-0000-000000000000"}),rental_listing_id.in.(${rentIds.join(",") || "00000000-0000-0000-0000-000000000000"})`)
+    .order("position");
+
+  const photoMap = new Map<string, string>();
+  for (const p of firstPhotos ?? []) {
+    const key = (p.sale_listing_id ?? p.rental_listing_id) as string;
+    if (!photoMap.has(key)) {
+      const url = supabase.storage.from("listing-photos").getPublicUrl(p.storage_path).data.publicUrl;
+      photoMap.set(key, url);
+    }
+  }
+  const photoFor = (_section: "sale" | "rent", id: string) => photoMap.get(id) ?? null;
+
   for (const j of (jobsRes.data ?? []) as unknown as Array<{
     id: string; title: string; pay_pln: number | null; pay_agreed: boolean; pay_type: string; kind: string;
     featured_until: string | null; bumped_at: string; lat: number | null; lng: number | null; localities: LocalityRef;
@@ -145,6 +166,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
       bumped_at: j.bumped_at,
       href: `/jobs/${j.id}`,
       badge: k[j.kind as Kind].badge,
+      photo: null,
     });
   }
 
@@ -166,6 +188,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
       bumped_at: s.bumped_at,
       href: `/listados/sale/${s.id}`,
       badge: l.sale,
+      photo: photoFor("sale", s.id),
     });
   }
 
@@ -187,6 +210,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
       bumped_at: r.bumped_at,
       href: `/listados/rent/${r.id}`,
       badge: l.rent,
+      photo: photoFor("rent", r.id),
     });
   }
 
@@ -306,18 +330,23 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
                   <span className={ui.badgeNeutral}>{c.badge}</span>
                   {isFeatured(c) && <span className={ui.badge}>{t.badgeFeatured}</span>}
                 </div>
-                <Link
-                  href={c.href}
-                  className="block text-base font-semibold text-slate-900 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded dark:text-slate-50"
-                >
-                  {c.title}
-                </Link>
-                <p className={`mt-1 ${ui.muted}`}>
-                  {c.city}
-                  {" · "}
-                  {c.agreed || c.price == null ? h.agreed : `${c.price} zł${c.unit ? ` / ${c.unit}` : ""}`}
-                  {c.distance != null && <> · {formatKm(c.distance)}</>}
-                </p>
+                <div className="flex gap-3">
+                  {c.photo && <ListingThumb src={c.photo} alt={c.title} />}
+                  <div className="min-w-0 flex-1">
+                    <Link
+                      href={c.href}
+                      className="block truncate text-base font-semibold text-slate-900 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded dark:text-slate-50"
+                    >
+                      {c.title}
+                    </Link>
+                    <p className={`mt-1 ${ui.muted}`}>
+                      {c.city}
+                      {" · "}
+                      {c.agreed || c.price == null ? h.agreed : `${c.price} zł${c.unit ? ` / ${c.unit}` : ""}`}
+                      {c.distance != null && <> · {formatKm(c.distance)}</>}
+                    </p>
+                  </div>
+                </div>
               </li>
             ))}
           </ul>
