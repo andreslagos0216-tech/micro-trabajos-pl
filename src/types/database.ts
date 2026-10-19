@@ -548,6 +548,7 @@ export type Database = {
           featured_until: string | null
           furnished: boolean | null
           id: string
+          languages: Json
           lat: number | null
           lng: number | null
           locality_id: number | null
@@ -572,6 +573,7 @@ export type Database = {
           featured_until?: string | null
           furnished?: boolean | null
           id?: string
+          languages?: Json
           lat?: number | null
           lng?: number | null
           locality_id?: number | null
@@ -596,6 +598,7 @@ export type Database = {
           featured_until?: string | null
           furnished?: boolean | null
           id?: string
+          languages?: Json
           lat?: number | null
           lng?: number | null
           locality_id?: number | null
@@ -759,6 +762,7 @@ export type Database = {
           description: string
           featured_until: string | null
           id: string
+          languages: Json
           lat: number | null
           lng: number | null
           locality_id: number | null
@@ -780,6 +784,7 @@ export type Database = {
           description: string
           featured_until?: string | null
           id?: string
+          languages?: Json
           lat?: number | null
           lng?: number | null
           locality_id?: number | null
@@ -801,6 +806,7 @@ export type Database = {
           description?: string
           featured_until?: string | null
           id?: string
+          languages?: Json
           lat?: number | null
           lng?: number | null
           locality_id?: number | null

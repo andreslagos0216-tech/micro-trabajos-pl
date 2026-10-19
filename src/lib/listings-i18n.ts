@@ -53,6 +53,9 @@ const pl = {
   nearSearching: "Pokazuję ogłoszenia w promieniu",
   clearNear: "Wyczyść filtr",
   notice: "Ogłoszenie w języku oryginalnym.",
+  photosTitle: "Zdjęcia",
+  photosSaveHint: "Zdjęcia dodasz po opublikowaniu, w widoku swojego ogłoszenia.",
+  spokenLanguagesLabel: "Języki, którymi się posługujesz",
 };
 
 export type ListingsDict = typeof pl;
@@ -110,6 +113,9 @@ const es: ListingsDict = {
   nearSearching: "Mostrando anuncios a",
   clearNear: "Quitar filtro",
   notice: "Anuncio en su idioma original.",
+  photosTitle: "Fotos",
+  photosSaveHint: "Podrás añadir las fotos después de publicar, desde la vista de tu anuncio.",
+  spokenLanguagesLabel: "Idiomas que hablas",
 };
 
 const en: ListingsDict = {
@@ -165,6 +171,9 @@ const en: ListingsDict = {
   nearSearching: "Showing listings within",
   clearNear: "Clear filter",
   notice: "Listing in its original language.",
+  photosTitle: "Photos",
+  photosSaveHint: "You can add photos after publishing, from your listing page.",
+  spokenLanguagesLabel: "Languages you speak",
 };
 
 export const listingsText: Record<Lang, ListingsDict> = { pl, es, en };
