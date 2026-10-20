@@ -38,12 +38,20 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const cat = CATEGORIAS[categoria];
   const city = await findCity(ciudad);
   if (!cat || !city) return {};
+  const sb = await createClient();
+  const { data: catRows } = await sb.from("categories").select("id").in("slug", cat.slug);
+  const catIds = (catRows ?? []).map((c) => c.id);
+  const { count } = catIds.length
+    ? await sb.from("job_posts").select("id", { count: "exact", head: true }).eq("status", "active").eq("locality_id", city.id).in("category_id", catIds)
+    : { count: 0 };
+  const hasListings = (count ?? 0) > 0;
   const title = `${cat.es} en ${city.name} | TaskGo`;
   const description = `${cat.es} en ${city.name}: ofertas por horas y por día entre personas de tu zona. Publica o busca gratis en TaskGo.`;
   return {
     title,
     description,
     alternates: { canonical: `https://taskgo.pl/trabajo/${ciudad}/${categoria}` },
+    robots: hasListings ? undefined : { index: false, follow: true },
     openGraph: { title, description, url: `https://taskgo.pl/trabajo/${ciudad}/${categoria}` },
   };
 }
