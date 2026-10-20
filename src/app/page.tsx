@@ -333,8 +333,11 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
                   <span className={ui.badgeNeutral}>{c.badge}</span>
                   {isFeatured(c) && <span className={ui.badge}>{t.badgeFeatured}</span>}
                 </div>
-                <div className="flex gap-3">
-                  {c.photo && <ListingThumb src={c.photo} alt={c.title} />}
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  {c.photo && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={c.photo} alt={c.title} loading="lazy" className="aspect-[4/3] w-full rounded-lg object-cover sm:aspect-square sm:w-28 sm:shrink-0" />
+                  )}
                   <div className="min-w-0 flex-1">
                     <Link
                       href={c.href}

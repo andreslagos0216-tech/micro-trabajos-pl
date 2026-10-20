@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { ConfirmGate } from "@/components/confirm-gate";
 import { Analytics } from "@/components/analytics";
+import { MobileNav } from "@/components/mobile-nav";
 import { InstallBanner } from "@/components/install-banner";
 import { SwRegister } from "@/components/sw-register";
 import "./globals.css";
@@ -28,10 +29,11 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pl">
-      <body className="flex min-h-screen flex-col">
+      <body className="flex min-h-screen flex-col pb-24 md:pb-0">
         <Suspense fallback={<div className="h-16 border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900" />}>
           <SiteHeader />
         <ConfirmGate />
+        <MobileNav />
         </Suspense>
         <div className="flex-1">{children}</div>
         <Suspense fallback={null}>
