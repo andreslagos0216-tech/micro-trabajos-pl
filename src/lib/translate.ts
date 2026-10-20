@@ -1,4 +1,4 @@
-﻿import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { Lang } from "@/lib/i18n";
 
 type TextRow = {
@@ -51,23 +51,12 @@ export async function localizeMany<T extends TextRow>(rows: T[], target: Lang) {
 
 // Traduce respetando los saltos de línea
 async function translateField(text: string, source: Lang, target: Lang): Promise<string> {
-  const lines = text.split("\n");
-  const out: string[] = [];
+  if (source === target || !text.trim()) return text;
 
-  for (const line of lines) {
-    if (!line.trim()) {
-      out.push("");
-      continue;
-    }
-    if (process.env.DEEPL_API_KEY) {
-      out.push(await deepl(line, source, target));
-    } else {
-      const parts = await Promise.all(chunk(line, 400).map((p) => myMemory(p, source, target)));
-      out.push(parts.join(" "));
-    }
-  }
-
-  return out.join("\n");
+  // Una sola llamada por campo; los saltos de línea se conservan marcándolos antes
+  const marked = text.replace(/\n/g, " ⏎ ");
+  const translated = await translateChunk(marked, source, target);
+  return translated.replace(/\s*⏎\s*/g, "\n");
 }
 
 // Divide un texto en trozos de hasta `max` caracteres, cortando por frases o por palabras
@@ -135,4 +124,25 @@ async function deepl(text: string, source: Lang, target: Lang): Promise<string> 
 
   const data = (await res.json()) as { translations: { text: string }[] };
   return data.translations[0].text;
+}
+
+// Una llamada al servicio de traducción: DeepL si hay clave, o MyMemory gratuito
+async function translateChunk(text: string, source: Lang, target: Lang): Promise<string> {
+  const deeplKey = process.env.DEEPL_API_KEY;
+  if (deeplKey) {
+    const res = await fetch("https://api-free.deepl.com/v2/translate", {
+      method: "POST",
+      headers: { Authorization: `DeepL-Auth-Key ${deeplKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ text: [text], source_lang: DEEPL_SOURCE[source], target_lang: DEEPL_TARGET[target] }),
+    });
+    if (!res.ok) throw new Error(`DeepL respondió ${res.status}`);
+    const data = (await res.json()) as { translations: { text: string }[] };
+    return data.translations[0].text;
+  }
+
+  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text.slice(0, 450))}&langpair=${source}|${target}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`MyMemory respondió ${res.status}`);
+  const data = (await res.json()) as { responseData?: { translatedText?: string } };
+  return data.responseData?.translatedText ?? text;
 }

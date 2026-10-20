@@ -867,6 +867,38 @@ export type Database = {
           },
         ]
       }
+      rental_translations: {
+        Row: {
+          created_at: string
+          description: string
+          lang: string
+          rental_listing_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          lang: string
+          rental_listing_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          lang?: string
+          rental_listing_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rental_translations_rental_listing_id_fkey"
+            columns: ["rental_listing_id"]
+            isOneToOne: false
+            referencedRelation: "rental_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reports: {
         Row: {
           created_at: string
@@ -1087,6 +1119,38 @@ export type Database = {
             columns: ["reviewed_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sale_translations: {
+        Row: {
+          created_at: string
+          description: string
+          lang: string
+          sale_listing_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          lang: string
+          sale_listing_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          lang?: string
+          sale_listing_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sale_translations_sale_listing_id_fkey"
+            columns: ["sale_listing_id"]
+            isOneToOne: false
+            referencedRelation: "sale_listings"
             referencedColumns: ["id"]
           },
         ]
