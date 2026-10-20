@@ -65,7 +65,7 @@ async function Inbox() {
             const unread = isOwner ? !c.owner_read_at : !c.buyer_read_at;
             const otherId = (isOwner ? c.buyer_id : c.owner_id) ?? "";
             const isSystem = (c as { is_system?: boolean }).is_system === true;
-            const otherName = isSystem ? "TaskGo" : nameOf.get(otherId) || (lang === "pl" ? "Użytkownik" : lang === "en" ? "User" : "Usuario");
+            const otherName = isSystem ? "TaskGo" : nameOf.get(otherId) || (lang === "pl" ? "Ogłoszeniodawca" : lang === "en" ? "Advertiser" : "Anunciante");
             return (
               <li key={c.id}>
                 <Link href={`/mensajes/${c.id}`} className={`${ui.card} flex items-center gap-3 transition active:scale-[0.99]`}>

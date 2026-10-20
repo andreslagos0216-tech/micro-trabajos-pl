@@ -14,6 +14,7 @@ import { listingMetadata } from "@/lib/seo";
 import { ReportForm } from "@/components/report-form";
 import { JobContact } from "@/components/job-contact";
 import { FavoriteButton } from "@/components/favorite-button";
+import { MessageButton } from "@/components/message-button";
 import { startFeaturedCheckout } from "./actions";
 import { deleteJob } from "./owner-actions";
 import { ownerText } from "@/lib/owner-i18n";
@@ -156,6 +157,7 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
 
       <div className="mt-6">
         <FavoriteButton kind="job" listingId={job.id} initial={await isJobSaved(supabase, user?.id, job.id)} lang={lang} path={`/jobs/${job.id}`} loggedIn={!!user} />
+        <MessageButton kind="job" listingId={job.id} lang={lang} isOwner={user?.id === job.author_id} loggedIn={!!user} />
         <JobContact
           lang={lang}
           jobId={job.id}

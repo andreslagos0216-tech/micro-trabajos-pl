@@ -91,7 +91,7 @@ export async function ContactBlock({
           {t.whatsapp}
         </a>
       )}
-      {wantsChat && <p className={`text-sm ${ui.muted}`}>{t.chatSoon}</p>}
+
       {!number && !wantsChat && <p className={`text-sm ${ui.muted}`}>{t.noShare}</p>}
     </section>
   );
