@@ -27,7 +27,7 @@ export async function MobileNav() {
   return (
     <nav
       aria-label="Menu"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur md:hidden dark:border-slate-800 dark:bg-slate-900/95"
+      className="fixed inset-x-0 bottom-0 z-50 rounded-t-[20px] border-0 bg-white/95 shadow-[0_-2px_16px_rgba(0,0,0,0.08)] backdrop-blur md:hidden dark:bg-slate-900/95"
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <ul className="mx-auto grid max-w-md grid-cols-5">
@@ -37,8 +37,8 @@ export async function MobileNav() {
               href={item.href}
               className={
                 item.primary
-                  ? "-mt-5 flex h-14 w-14 items-center justify-center rounded-full bg-blue-700 text-3xl font-bold text-white shadow-lg"
-                  : "flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium text-slate-700 dark:text-slate-300"
+                  ? "-mt-6 flex h-14 w-14 items-center justify-center rounded-full bg-blue-700 text-3xl font-bold text-white shadow-[0_4px_24px_rgba(29,78,216,0.35)]"
+                  : "flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium text-slate-600 dark:text-slate-300"
               }
             >
               <span className={item.primary ? "" : "text-lg"} aria-hidden="true">{item.icon}</span>
