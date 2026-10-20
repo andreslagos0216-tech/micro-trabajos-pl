@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { ConfirmGate } from "@/components/confirm-gate";
+import { Analytics } from "@/components/analytics";
 import { InstallBanner } from "@/components/install-banner";
 import { SwRegister } from "@/components/sw-register";
 import "./globals.css";
