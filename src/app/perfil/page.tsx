@@ -100,9 +100,15 @@ async function ProfileContent({ searchParams }: { searchParams: SearchParams }) 
         <Link href={`/usuario/${user.id}`} className={ui.link}>{t.publicProfile}</Link>
       </section>
 
-      <section className={`${ui.card} mb-6`}>
-        <h2 className={ui.sectionTitle}>{t.dataTitle}</h2>
-        <form action={updateProfile} className="space-y-5">
+      <details className={`${ui.card} mb-6`}>
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
+          <span>
+            <span className="block text-base font-semibold text-slate-900 dark:text-slate-50">{t.dataTitle}</span>
+            <span className={`block text-xs ${ui.muted}`}>{profile?.full_name ?? ""}{currentLocality ? ` · ${currentLocality}` : ""}</span>
+          </span>
+          <span className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:border-slate-600 dark:text-slate-200">Editar ▾</span>
+        </summary>
+        <form action={updateProfile} className="mt-6 space-y-5">
           <div>
             <label htmlFor="full_name" className={ui.label}>{t.nameLabel}</label>
             <input id="full_name" name="full_name" maxLength={80} defaultValue={profile?.full_name ?? ""} className={ui.input} />
@@ -142,7 +148,7 @@ async function ProfileContent({ searchParams }: { searchParams: SearchParams }) 
 
           <button type="submit" className={ui.button}>{t.save}</button>
         </form>
-      </section>
+      </details>
 
       <section className="mb-6">
         <h2 className={ui.sectionTitle}>{t.myListings}</h2>

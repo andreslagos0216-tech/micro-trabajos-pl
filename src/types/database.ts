@@ -551,6 +551,75 @@ export type Database = {
           },
         ]
       }
+      ratings: {
+        Row: {
+          created_at: string
+          id: string
+          job_id: string | null
+          rated_profile_id: string
+          rater_id: string
+          rental_listing_id: string | null
+          sale_listing_id: string | null
+          stars: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          job_id?: string | null
+          rated_profile_id: string
+          rater_id: string
+          rental_listing_id?: string | null
+          sale_listing_id?: string | null
+          stars: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          job_id?: string | null
+          rated_profile_id?: string
+          rater_id?: string
+          rental_listing_id?: string | null
+          sale_listing_id?: string | null
+          stars?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ratings_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "job_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ratings_rated_profile_id_fkey"
+            columns: ["rated_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ratings_rater_id_fkey"
+            columns: ["rater_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ratings_rental_listing_id_fkey"
+            columns: ["rental_listing_id"]
+            isOneToOne: false
+            referencedRelation: "rental_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ratings_sale_listing_id_fkey"
+            columns: ["sale_listing_id"]
+            isOneToOne: false
+            referencedRelation: "sale_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rental_listings: {
         Row: {
           area_m2: number | null
