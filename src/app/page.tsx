@@ -7,6 +7,7 @@ import { kindDict, type Kind } from "@/lib/i18n-kinds";
 import { homeText } from "@/lib/home-i18n";
 import { listingsText } from "@/lib/listings-i18n";
 import { tipsText } from "@/lib/tips-i18n";
+import { localizeMany } from "@/lib/translate";
 import { boundingBox, distanceKm, formatKm, parseNear } from "@/lib/geo";
 import { listHref } from "@/lib/url";
 import { ui } from "@/lib/ui";
@@ -19,6 +20,7 @@ type SearchParams = Promise<{ q?: string; f?: string; sort?: string; lat?: strin
 
 type Card = {
   id: string;
+  lang: string;
   kind: "job" | "sale" | "rent";
   title: string;
   price: number | null;
@@ -161,6 +163,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   }>) {
     cards.push({
       id: j.id,
+      lang: (j as unknown as { original_lang: string }).original_lang ?? "es",
       kind: "job",
       title: j.title,
       price: j.pay_pln,
@@ -183,6 +186,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   }>) {
     cards.push({
       id: s.id,
+      lang: (s as unknown as { original_lang: string }).original_lang ?? "es",
       kind: "sale",
       title: s.title,
       price: s.price_pln,
@@ -205,6 +209,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   }>) {
     cards.push({
       id: r.id,
+      lang: (r as unknown as { original_lang: string }).original_lang ?? "es",
       kind: "rent",
       title: r.title,
       price: r.rent_pln,
@@ -219,6 +224,21 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
       badge: l.rent,
       photo: photoFor("rent", r.id),
     });
+  }
+
+  const translatedRows = await localizeMany(
+    cards.map((c) => ({
+      id: c.id,
+      title: c.title,
+      description: "",
+      original_lang: (c.lang === "pl" || c.lang === "en" ? c.lang : "es") as "pl" | "es" | "en",
+    })),
+    lang
+  );
+  const titleOf = new Map(translatedRows.map((row) => [row.id, row.title]));
+  for (const c of cards) {
+    const translatedTitle = titleOf.get(c.id);
+    if (translatedTitle) c.title = translatedTitle;
   }
 
   const withDistance = cards
