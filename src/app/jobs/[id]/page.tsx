@@ -127,6 +127,12 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
         <div>
           <h2 className={ui.sectionTitle}>{k[kind].descLabel}</h2>
           <p className="whitespace-pre-line text-sm leading-relaxed text-slate-800 dark:text-slate-200">{local.description}</p>
+          {local.translated && (
+            <details className="mt-3 rounded-md bg-slate-50 p-3 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+              <summary className="cursor-pointer font-semibold">{lang === "pl" ? "Pokaż oryginał" : lang === "en" ? "Show original" : "Ver original"}</summary>
+              <p className="mt-2 whitespace-pre-line">{job.description}</p>
+            </details>
+          )}
           {local.translated && <p className={`mt-2 text-xs ${ui.muted}`}>{k.autoTranslated}</p>}
         </div>
 

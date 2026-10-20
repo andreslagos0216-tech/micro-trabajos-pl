@@ -233,6 +233,12 @@ async function ListingDetail({ params, searchParams }: { params: Params; searchP
         <div>
           <h2 className={ui.sectionTitle}>{t.descriptionTitle}</h2>
           <p className="whitespace-pre-line text-sm leading-relaxed text-slate-800 dark:text-slate-200">{local.description}</p>
+          {local.translated && (
+            <details className="mt-3 rounded-md bg-slate-50 p-3 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+              <summary className="cursor-pointer font-semibold">{lang === "pl" ? "Pokaż oryginał" : lang === "en" ? "Show original" : "Ver original"}</summary>
+              <p className="mt-2 whitespace-pre-line">{item.description}</p>
+            </details>
+          )}
           <p className={`mt-2 text-xs ${ui.muted}`}>
             {local.translated ? kindDict[lang].autoTranslated : t.notice}
           </p>
