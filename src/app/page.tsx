@@ -33,7 +33,8 @@ type Card = {
   photo: string | null;
 };
 
-const FILTERS = ["all", "job", "service", "candidate", "sale", "rent"] as const;
+const FILTERS = ["all", "job", "service", "candidate", "sale", "rent", "hourly"] as const;
+const HOURLY_LABEL: Record<Lang, string> = { pl: "Na godziny / dni", es: "Por horas o días", en: "Hourly or daily" };
 type Filter = (typeof FILTERS)[number];
 const SORTS = ["recent", "price_asc", "price_desc"] as const;
 type Sort = (typeof SORTS)[number];
@@ -81,7 +82,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
     { href: "/mapa", label: h.tiles.map.label, icon: "🗺️", keywords: h.tiles.map.keywords },
   ];
 
-  const wantJobs = filter === "all" || filter === "job" || filter === "service" || filter === "candidate";
+  const wantJobs = filter === "all" || filter === "job" || filter === "service" || filter === "candidate" || filter === "hourly";
   const wantSale = filter === "all" || filter === "sale";
   const wantRent = filter === "all" || filter === "rent";
 
@@ -97,6 +98,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
           .select("id, title, pay_pln, pay_agreed, pay_type, kind, featured_until, bumped_at, lat, lng, localities(name)")
           .eq("status", "active");
         if (jobKind) query = query.in("kind", jobKind);
+        if (filter === "hourly") query = query.in("pay_type", ["hour", "day"]);
         if (q) query = query.ilike("title", `%${q}%`);
         if (box) query = query.gte("lat", box.minLat).lte("lat", box.maxLat).gte("lng", box.minLng).lte("lng", box.maxLng);
         return query.order("bumped_at", { ascending: false }).limit(60);
@@ -158,7 +160,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
       title: j.title,
       price: j.pay_pln,
       agreed: j.pay_agreed,
-      unit: j.pay_type === "hour" ? t.perHour : t.perProject,
+      unit: j.pay_type === "hour" ? t.perHour : j.pay_type === "day" ? (lang === "es" ? "día" : lang === "en" ? "day" : "dzień") : t.perProject,
       city: j.localities?.name ?? null,
       lat: j.lat,
       lng: j.lng,
@@ -269,7 +271,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
                 : "border border-slate-300 bg-white text-slate-700 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200"
             }`}
           >
-            {h.filters[value]}
+            {value === "hourly" ? HOURLY_LABEL[lang] : h.filters[value]}
           </Link>
         ))}
       </div>

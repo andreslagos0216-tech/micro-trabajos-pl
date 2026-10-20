@@ -102,7 +102,7 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
             <div>
               <dt className={ui.muted}>{t.payTypeLabel}</dt>
               <dd className="font-medium text-slate-900 dark:text-slate-100">
-                {job.pay_type === "hour" ? t.payHour : t.payProject}
+                {job.pay_type === "hour" ? t.payHour : job.pay_type === "day" ? (lang === "es" ? "Por día" : lang === "en" ? "Per day" : "Za dzień") : t.payProject}
               </dd>
             </div>
             {job.availability && (

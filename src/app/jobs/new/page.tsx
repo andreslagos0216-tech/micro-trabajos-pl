@@ -132,6 +132,8 @@ async function NewJobContent({ searchParams }: { searchParams: SearchParams }) {
             <label htmlFor="pay_type" className={ui.label}>{t.payTypeLabel}</label>
             <select id="pay_type" name="pay_type" required defaultValue="hour" className={ui.input}>
               <option value="hour">{t.payHour}</option>
+              <option value="hour">{t.payHour}</option>
+              <option value="day">{lang === "es" ? "Por día" : lang === "en" ? "Per day" : "Za dzień"}</option>
               <option value="project">{t.payProject}</option>
             </select>
           </div>
