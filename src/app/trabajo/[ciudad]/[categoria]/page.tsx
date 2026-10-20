@@ -25,7 +25,7 @@ function slugify(text: string) {
 
 async function findCity(name: string) {
   const supabase = await createClient();
-  const pattern = name.replace(/-/g, "%");
+  const pattern = name.slice(0, 4) + "%";
   const { data } = await supabase.from("localities").select("id, name, voivodeship").ilike("name", pattern).limit(50);
   const exact = (data ?? []).find((c) => slugify(c.name) === name);
   if (exact) return exact;
