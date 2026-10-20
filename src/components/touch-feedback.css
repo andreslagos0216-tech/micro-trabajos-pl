@@ -1,0 +1,21 @@
+/* Respuesta inmediata al tocar en móviles */
+a, button, summary, label, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+a:active, button:active, summary:active {
+  opacity: 0.85;
+  transform: scale(0.98);
+  transition: transform 80ms ease-out, opacity 80ms ease-out;
+}
+
+button:disabled {
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a:active, button:active, summary:active {
+    transform: none;
+  }
+}

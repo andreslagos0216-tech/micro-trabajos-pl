@@ -13,6 +13,7 @@ import { ui } from "@/lib/ui";
 import { listingMetadata } from "@/lib/seo";
 import { ReportForm } from "@/components/report-form";
 import { JobContact } from "@/components/job-contact";
+import { FavoriteButton } from "@/components/favorite-button";
 import { startFeaturedCheckout } from "./actions";
 import { deleteJob } from "./owner-actions";
 import { ownerText } from "@/lib/owner-i18n";
@@ -154,6 +155,7 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
       </article>
 
       <div className="mt-6">
+        <FavoriteButton kind="job" listingId={job.id} initial={await isJobSaved(supabase, user?.id, job.id)} lang={lang} path={`/jobs/${job.id}`} loggedIn={!!user} />
         <JobContact
           lang={lang}
           jobId={job.id}
@@ -199,4 +201,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     price,
     path: `/jobs/${id}`,
   });
+}
+async function isJobSaved(supabase: Awaited<ReturnType<typeof createClient>>, userId: string | undefined, id: string) {
+  if (!userId) return false;
+  const { data } = await supabase.from("favorites").select("id").eq("user_id", userId).eq("listing_kind", "job").eq("listing_id", id).maybeSingle();
+  return !!data;
 }
