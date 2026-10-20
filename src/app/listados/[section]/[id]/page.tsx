@@ -16,6 +16,7 @@ import { ui } from "@/lib/ui";
 import { listingMetadata } from "@/lib/seo";
 import { ReportForm } from "@/components/report-form";
 import { ContactBlock } from "@/components/contact-block";
+import { MessageButton } from "@/components/message-button";
 import { PhotoUploader } from "@/components/photo-uploader";
 import { startListingFeatured } from "./actions";
 import { setListingStatus, deleteListing } from "./owner-actions";
@@ -274,6 +275,7 @@ async function ListingDetail({ params, searchParams }: { params: Params; searchP
       </article>
 
       <div className="mt-6">
+        <MessageButton kind={section === "sale" ? "sale" : "rent"} listingId={id} lang={lang} isOwner={isOwner} loggedIn={!!user} />
         <ContactBlock
           lang={lang}
           authorId={item.author_id}
