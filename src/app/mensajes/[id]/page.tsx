@@ -34,12 +34,13 @@ async function Conversation({ params }: { params: Params }) {
 
   const { data: conv } = await supabase
     .from("conversations")
-    .select("id, owner_id, buyer_id, listing_kind, listing_id")
+    .select("id, owner_id, buyer_id, listing_kind, listing_id, is_system")
     .eq("id", id)
     .single();
   if (!conv) notFound();
 
   const isOwner = conv.owner_id === user.id;
+  const isSystem = (conv as { is_system?: boolean }).is_system === true;
   const now = new Date().toISOString();
   await supabase
     .from("conversations")
@@ -48,7 +49,7 @@ async function Conversation({ params }: { params: Params }) {
 
   const { data: messages } = await supabase
     .from("messages")
-    .select("id, body, sender_id, original_lang, created_at")
+    .select("id, body, sender_id, original_lang, created_at, is_system")
     .eq("conversation_id", id)
     .order("created_at", { ascending: true })
     .limit(200);
@@ -59,7 +60,7 @@ async function Conversation({ params }: { params: Params }) {
     .eq("id", conv.listing_id)
     .single();
 
-  const otherId = isOwner ? conv.buyer_id : conv.owner_id;
+  const otherId = (isOwner ? conv.buyer_id : conv.owner_id) ?? "";
   const { data: other } = await supabase.from("profiles").select("full_name").eq("id", otherId).single();
   const otherName = other?.full_name || (lang === "pl" ? "Użytkownik" : lang === "en" ? "User" : "Usuario");
 
@@ -97,11 +98,15 @@ async function Conversation({ params }: { params: Params }) {
         })}
       </ul>
 
+      {isSystem ? (
+        <p className={`mt-6 text-center text-xs ${ui.muted}`}>Aviso automático de TaskGo. No se puede responder a este mensaje.</p>
+      ) : (
       <form action={sendAction} className="sticky bottom-20 mt-6 flex gap-2 md:bottom-4">
         <label htmlFor="body" className="sr-only">{write}</label>
         <input id="body" name="body" required maxLength={1000} placeholder={write} className={`${ui.input} flex-1`} />
         <button type="submit" className={ui.button}>{send}</button>
       </form>
+      )}
     </>
   );
 }

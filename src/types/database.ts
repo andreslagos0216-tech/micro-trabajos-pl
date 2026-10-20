@@ -145,10 +145,11 @@ export type Database = {
       }
       conversations: {
         Row: {
-          buyer_id: string
+          buyer_id: string | null
           buyer_read_at: string | null
           created_at: string
           id: string
+          is_system: boolean
           last_message_at: string
           listing_id: string
           listing_kind: string
@@ -156,10 +157,11 @@ export type Database = {
           owner_read_at: string | null
         }
         Insert: {
-          buyer_id: string
+          buyer_id?: string | null
           buyer_read_at?: string | null
           created_at?: string
           id?: string
+          is_system?: boolean
           last_message_at?: string
           listing_id: string
           listing_kind: string
@@ -167,10 +169,11 @@ export type Database = {
           owner_read_at?: string | null
         }
         Update: {
-          buyer_id?: string
+          buyer_id?: string | null
           buyer_read_at?: string | null
           created_at?: string
           id?: string
+          is_system?: boolean
           last_message_at?: string
           listing_id?: string
           listing_kind?: string
@@ -509,24 +512,27 @@ export type Database = {
           conversation_id: string
           created_at: string
           id: string
+          is_system: boolean
           original_lang: string
-          sender_id: string
+          sender_id: string | null
         }
         Insert: {
           body: string
           conversation_id: string
           created_at?: string
           id?: string
+          is_system?: boolean
           original_lang?: string
-          sender_id: string
+          sender_id?: string | null
         }
         Update: {
           body?: string
           conversation_id?: string
           created_at?: string
           id?: string
+          is_system?: boolean
           original_lang?: string
-          sender_id?: string
+          sender_id?: string | null
         }
         Relationships: [
           {

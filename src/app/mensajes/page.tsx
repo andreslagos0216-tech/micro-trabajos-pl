@@ -32,9 +32,19 @@ async function Inbox() {
     supabase.from("conversations").select(cols).eq("owner_id", user.id).order("last_message_at", { ascending: false }).limit(100),
     supabase.from("conversations").select(cols).eq("buyer_id", user.id).order("last_message_at", { ascending: false }).limit(100),
   ]);
-  const rows = [...(asOwner.data ?? []), ...(asBuyer.data ?? [])].sort((a, b) => b.last_message_at.localeCompare(a.last_message_at));
+  const { data: systemRows } = await supabase
+    .from("conversations")
+    .select(cols)
+    .eq("owner_id", user.id)
+    .eq("is_system", true)
+    .order("last_message_at", { ascending: false })
+    .limit(1);
+  const rows = [...(asOwner.data ?? []), ...(asBuyer.data ?? [])]
+    .filter((c) => !(c as { is_system?: boolean }).is_system)
+    .concat(systemRows ?? [])
+    .sort((a, b) => b.last_message_at.localeCompare(a.last_message_at));
 
-  const otherIds = [...new Set((rows ?? []).map((c) => (c.owner_id === user.id ? c.buyer_id : c.owner_id)))];
+  const otherIds = [...new Set((rows ?? []).map((c) => (c.owner_id === user.id ? c.buyer_id : c.owner_id)).filter((x): x is string => !!x))];
   const { data: people } = otherIds.length
     ? await supabase.from("profiles").select("id, full_name").in("id", otherIds)
     : { data: [] as { id: string; full_name: string | null }[] };
@@ -53,12 +63,13 @@ async function Inbox() {
           {(rows ?? []).map((c) => {
             const isOwner = c.owner_id === user.id;
             const unread = isOwner ? !c.owner_read_at : !c.buyer_read_at;
-            const otherId = isOwner ? c.buyer_id : c.owner_id;
-            const otherName = nameOf.get(otherId) || (lang === "pl" ? "Użytkownik" : lang === "en" ? "User" : "Usuario");
+            const otherId = (isOwner ? c.buyer_id : c.owner_id) ?? "";
+            const isSystem = (c as { is_system?: boolean }).is_system === true;
+            const otherName = isSystem ? "TaskGo" : nameOf.get(otherId) || (lang === "pl" ? "Użytkownik" : lang === "en" ? "User" : "Usuario");
             return (
               <li key={c.id}>
                 <Link href={`/mensajes/${c.id}`} className={`${ui.card} flex items-center gap-3 transition active:scale-[0.99]`}>
-                  <Avatar name={otherName} size={44} />
+                  {isSystem ? <span className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-700 text-lg font-bold text-white">T</span> : <Avatar name={otherName} size={44} />}
                   <span className="min-w-0 flex-1">
                     <span className={`block truncate text-sm ${unread ? "font-bold text-slate-900 dark:text-slate-50" : "font-semibold text-slate-800 dark:text-slate-200"}`}>{otherName}</span>
                     <span className={`block text-xs ${ui.muted}`}>{new Date(c.last_message_at).toLocaleString(lang === "pl" ? "pl-PL" : lang === "en" ? "en-GB" : "es-ES", { dateStyle: "short", timeStyle: "short" })}</span>
