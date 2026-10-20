@@ -25,12 +25,12 @@ async function Inbox() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: rows } = await supabase
-    .from("conversations")
-    .select("id, last_message_at, owner_id, buyer_id, owner_read_at, buyer_read_at, listing_kind")
-    .or(`owner_id.eq.${user.id},buyer_id.eq.${user.id}`)
-    .order("last_message_at", { ascending: false })
-    .limit(100);
+  const cols = "id, last_message_at, owner_id, buyer_id, owner_read_at, buyer_read_at, listing_kind";
+  const [asOwner, asBuyer] = await Promise.all([
+    supabase.from("conversations").select(cols).eq("owner_id", user.id).order("last_message_at", { ascending: false }).limit(100),
+    supabase.from("conversations").select(cols).eq("buyer_id", user.id).order("last_message_at", { ascending: false }).limit(100),
+  ]);
+  const rows = [...(asOwner.data ?? []), ...(asBuyer.data ?? [])].sort((a, b) => b.last_message_at.localeCompare(a.last_message_at));
 
   const title = lang === "pl" ? "Wiadomości" : lang === "en" ? "Messages" : "Mensajes";
   const empty = lang === "pl" ? "Nie masz jeszcze wiadomości." : lang === "en" ? "You have no messages yet." : "Todavía no tienes mensajes.";
