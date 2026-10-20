@@ -80,6 +80,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
     { href: "/listados/sale", label: h.tiles.sale.label, icon: "🛒", keywords: h.tiles.sale.keywords },
     { href: "/listados/rent", label: h.tiles.rent.label, icon: "🏠", keywords: h.tiles.rent.keywords },
     { href: "/mapa", label: h.tiles.map.label, icon: "🗺️", keywords: h.tiles.map.keywords },
+    { href: "/conseguir-personal", label: (lang === "pl" ? "Potrzebuję ludzi" : lang === "en" ? "Need staff" : "Necesito personal"), icon: "🤝", keywords: "personal ayuda trabajadores limpieza nieve ayudante" },
   ];
 
   const wantJobs = filter === "all" || filter === "job" || filter === "service" || filter === "candidate" || filter === "hourly";
