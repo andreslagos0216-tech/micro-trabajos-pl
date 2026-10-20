@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ui } from "@/lib/ui";
 import { moderateListing } from "./actions";
+import { StaffRequestsPanel } from "@/components/staff-requests-panel";
 
 const REASON: Record<string, string> = {
   scam: "Posible estafa o pago por adelantado",
@@ -58,6 +59,7 @@ async function AdminContent() {
 
       {items.length === 0 && <p className={ui.emptyBox}>No hay anuncios pendientes.</p>}
 
+      <StaffRequestsPanel />
       <ul className="space-y-4">
         {items.map((item) => {
           const reasons = (item.review_note ?? "").split(",").filter(Boolean);

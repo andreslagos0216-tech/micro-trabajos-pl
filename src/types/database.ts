@@ -891,6 +891,62 @@ export type Database = {
           },
         ]
       }
+      staff_requests: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          language: string
+          locality_id: number | null
+          pay_pln: number | null
+          pay_type: string
+          people_count: number
+          requester_name: string
+          status: string
+          whatsapp: string
+          when_needed: string | null
+          work_type: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          language?: string
+          locality_id?: number | null
+          pay_pln?: number | null
+          pay_type?: string
+          people_count?: number
+          requester_name: string
+          status?: string
+          whatsapp: string
+          when_needed?: string | null
+          work_type: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          language?: string
+          locality_id?: number | null
+          pay_pln?: number | null
+          pay_type?: string
+          people_count?: number
+          requester_name?: string
+          status?: string
+          whatsapp?: string
+          when_needed?: string | null
+          work_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_requests_locality_id_fkey"
+            columns: ["locality_id"]
+            isOneToOne: false
+            referencedRelation: "localities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
