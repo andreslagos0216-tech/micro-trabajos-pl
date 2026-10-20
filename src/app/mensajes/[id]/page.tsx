@@ -7,6 +7,7 @@ import { getLang } from "@/lib/i18n";
 import { ui } from "@/lib/ui";
 import { sendMessage } from "../actions";
 import { Avatar } from "@/components/avatar";
+import { translateText } from "@/lib/translate-text";
 
 type Params = Promise<{ id: string }>;
 
@@ -83,19 +84,21 @@ async function Conversation({ params }: { params: Params }) {
       </header>
 
       <ul className="space-y-2">
-        {(messages ?? []).map((m) => {
+        {await Promise.all((messages ?? []).map(async (m) => {
           const mine = m.sender_id === user.id;
+          const shown = m.is_system || m.original_lang === lang ? m.body : await translateText(m.body, m.original_lang as "pl" | "es" | "en", lang);
+          const translated = !m.is_system && m.original_lang !== lang;
           return (
             <li key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
               <div className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm ${mine ? "bg-blue-700 text-white" : "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100"}`}>
-                <p className="whitespace-pre-line">{m.body}</p>
-                {m.original_lang !== lang && (
-                  <p className="mt-1 text-[11px] opacity-70">{m.original_lang.toUpperCase()}</p>
+                <p className="whitespace-pre-line">{shown}</p>
+                {translated && (
+                  <p className="mt-1 whitespace-pre-line text-[11px] opacity-70">{m.body}</p>
                 )}
               </div>
             </li>
           );
-        })}
+        }))}
       </ul>
 
       {isSystem ? (
