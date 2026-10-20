@@ -42,5 +42,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...staticPages, ...jobPages, ...salePages, ...rentPages];
+  const cityPages: MetadataRoute.Sitemap = [];
+  const { data: cities } = await admin
+    .from("localities")
+    .select("name")
+    .gte("population", 20000)
+    .limit(200);
+  const cats = ["limpieza", "nieve", "mudanzas", "cuidado", "masajes", "reparaciones", "ayuda"];
+  for (const c of cities ?? []) {
+    const citySlug = c.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/ł/g, "l").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    for (const cat of cats) {
+      cityPages.push({ url: `${BASE}/trabajo/${citySlug}/${cat}`, changeFrequency: "daily", priority: 0.7 });
+    }
+  }
+
+  return [...staticPages, ...jobPages, ...salePages, ...rentPages, ...cityPages];
 }
