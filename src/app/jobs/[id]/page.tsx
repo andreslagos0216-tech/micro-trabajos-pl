@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { dict, getLang, type Lang } from "@/lib/i18n";
+import { formatDate, formatDateTime } from "@/lib/format";
 import { kindDict, type Kind } from "@/lib/i18n-kinds";
 import { categoryName } from "@/lib/labels";
 import { localizeJob } from "@/lib/translate";
@@ -143,7 +144,7 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
               <p className="mt-1 text-slate-700 dark:text-slate-300">{t.statusLabel}: {statusLabel}</p>
               {isFeatured && (
                 <p className="mt-1 text-slate-700 dark:text-slate-300">
-                  {t.featuredUntil} {new Date(job.featured_until!).toLocaleDateString(t.locale)}
+                  {t.featuredUntil} {formatDate(job.featured_until!, lang)}
                 </p>
               )}
             </div>

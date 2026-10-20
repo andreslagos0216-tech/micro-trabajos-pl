@@ -5,6 +5,7 @@ import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getLang } from "@/lib/i18n";
+import { formatDate, formatDateTime } from "@/lib/format";
 import { perfilText } from "@/lib/perfil-text";
 import { ui } from "@/lib/ui";
 
@@ -80,7 +81,7 @@ async function PublicProfileContent({ params }: { params: Params }) {
           {" · "}
           {profile.is_verified ? `✓ ${t.verified}` : t.notVerified}
           {" · "}
-          {t.memberSince} {profile.created_at ? new Date(profile.created_at).toLocaleDateString(t.locale) : ""}
+          {t.memberSince} {profile.created_at ? formatDate(profile.created_at, lang) : ""}
         </p>
         {profile.bio && <p className="whitespace-pre-line text-sm text-slate-800 dark:text-slate-200">{profile.bio}</p>}
         {languages.length > 0 && <p className={`text-sm ${ui.muted}`}>{t.languagesLabel}: {languages.map((x) => x.toUpperCase()).join(", ")}</p>}

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getLang } from "@/lib/i18n";
+import { formatDate, formatDateTime } from "@/lib/format";
 import { ui } from "@/lib/ui";
 import { Avatar } from "@/components/avatar";
 
@@ -72,7 +73,7 @@ async function Inbox() {
                   {isSystem ? <span className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-700 text-lg font-bold text-white">T</span> : <Avatar name={otherName} size={44} />}
                   <span className="min-w-0 flex-1">
                     <span className={`block truncate text-sm ${unread ? "font-bold text-slate-900 dark:text-slate-50" : "font-semibold text-slate-800 dark:text-slate-200"}`}>{otherName}</span>
-                    <span className={`block text-xs ${ui.muted}`}>{new Date(c.last_message_at).toLocaleString(lang === "pl" ? "pl-PL" : lang === "en" ? "en-GB" : "es-ES", { dateStyle: "short", timeStyle: "short" })}</span>
+                    <span className={`block text-xs ${ui.muted}`}>{formatDateTime(c.last_message_at, lang)}</span>
                   </span>
                   {unread && <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-blue-600" aria-label="nuevo" />}
                 </Link>
