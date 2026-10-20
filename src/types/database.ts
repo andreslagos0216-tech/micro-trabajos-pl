@@ -143,6 +143,57 @@ export type Database = {
         }
         Relationships: []
       }
+      conversations: {
+        Row: {
+          buyer_id: string
+          buyer_read_at: string | null
+          created_at: string
+          id: string
+          last_message_at: string
+          listing_id: string
+          listing_kind: string
+          owner_id: string
+          owner_read_at: string | null
+        }
+        Insert: {
+          buyer_id: string
+          buyer_read_at?: string | null
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          listing_id: string
+          listing_kind: string
+          owner_id: string
+          owner_read_at?: string | null
+        }
+        Update: {
+          buyer_id?: string
+          buyer_read_at?: string | null
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          listing_id?: string
+          listing_kind?: string
+          owner_id?: string
+          owner_read_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_posts: {
         Row: {
           author_id: string
@@ -419,6 +470,48 @@ export type Database = {
           voivodeship?: string | null
         }
         Relationships: []
+      }
+      messages: {
+        Row: {
+          body: string
+          conversation_id: string
+          created_at: string
+          id: string
+          original_lang: string
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          original_lang?: string
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          original_lang?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       orders: {
         Row: {
