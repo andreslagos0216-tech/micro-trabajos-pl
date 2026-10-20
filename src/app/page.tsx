@@ -108,7 +108,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
         if (filter === "hourly") query = query.in("pay_type", ["hour", "day"]);
         if (q) query = query.ilike("title", `%${q}%`);
         if (box) query = query.gte("lat", box.minLat).lte("lat", box.maxLat).gte("lng", box.minLng).lte("lng", box.maxLng);
-        return query.order("bumped_at", { ascending: false }).limit(60);
+        return query.order("bumped_at", { ascending: false }).limit(24);
       })()
     : { data: [] };
 
@@ -120,7 +120,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
           .eq("status", "active");
         if (q) query = query.ilike("title", `%${q}%`);
         if (box) query = query.gte("lat", box.minLat).lte("lat", box.maxLat).gte("lng", box.minLng).lte("lng", box.maxLng);
-        return query.order("bumped_at", { ascending: false }).limit(60);
+        return query.order("bumped_at", { ascending: false }).limit(24);
       })()
     : { data: [] };
 
@@ -132,7 +132,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
           .eq("status", "active");
         if (q) query = query.ilike("title", `%${q}%`);
         if (box) query = query.gte("lat", box.minLat).lte("lat", box.maxLat).gte("lng", box.minLng).lte("lng", box.maxLng);
-        return query.order("bumped_at", { ascending: false }).limit(60);
+        return query.order("bumped_at", { ascending: false }).limit(24);
       })()
     : { data: [] };
 
@@ -266,7 +266,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
     return b.bumped_at.localeCompare(a.bumped_at);
   });
 
-  const visible = withDistance.slice(0, 60);
+  const visible = withDistance.slice(0, 24);
 
   const linkFor = (params: { f?: string; sort?: string }) =>
     listHref("/", {
