@@ -196,6 +196,7 @@ async function ProfileContent({ searchParams }: { searchParams: SearchParams }) 
 
       <section className={`${ui.card} space-y-3`}>
         <h2 className={ui.sectionTitle}>{t.session}</h2>
+        <Link href="/guardados" className={ui.buttonSecondary}>♥ Guardados</Link>
         {isAdmin && <Link href="/admin" className={ui.buttonSecondary}>{t.admin}</Link>}
         <form action={signOut}>
           <button type="submit" className={ui.buttonSecondary}>{t.logout}</button>

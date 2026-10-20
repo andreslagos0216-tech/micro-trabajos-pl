@@ -17,6 +17,7 @@ import { listingMetadata } from "@/lib/seo";
 import { ReportForm } from "@/components/report-form";
 import { ContactBlock } from "@/components/contact-block";
 import { MessageButton } from "@/components/message-button";
+import { FavoriteButton } from "@/components/favorite-button";
 import { PhotoUploader } from "@/components/photo-uploader";
 import { startListingFeatured } from "./actions";
 import { setListingStatus, deleteListing } from "./owner-actions";
@@ -275,6 +276,7 @@ async function ListingDetail({ params, searchParams }: { params: Params; searchP
       </article>
 
       <div className="mt-6">
+        <FavoriteButton kind={section === "sale" ? "sale" : "rent"} listingId={id} initial={await isSaved(supabase, user?.id, section === "sale" ? "sale" : "rent", id)} lang={lang} path={`/listados/${section}/${id}`} loggedIn={!!user} />
         <MessageButton kind={section === "sale" ? "sale" : "rent"} listingId={id} lang={lang} isOwner={isOwner} loggedIn={!!user} />
         <ContactBlock
           lang={lang}
@@ -326,4 +328,9 @@ export async function generateMetadata({ params }: { params: Promise<{ section: 
     price,
     path: `/listados/${section}/${id}`,
   });
+}
+async function isSaved(supabase: Awaited<ReturnType<typeof createClient>>, userId: string | undefined, kind: "sale" | "rent", id: string) {
+  if (!userId) return false;
+  const { data } = await supabase.from("favorites").select("id").eq("user_id", userId).eq("listing_kind", kind).eq("listing_id", id).maybeSingle();
+  return !!data;
 }
