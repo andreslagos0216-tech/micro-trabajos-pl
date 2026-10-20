@@ -25,8 +25,10 @@ function slugify(text: string) {
 
 async function findCity(name: string) {
   const supabase = await createClient();
-  const { data } = await supabase.from("localities").select("id, name, voivodeship").limit(5000);
-  return (data ?? []).find((c) => slugify(c.name) === name) ?? null;
+  const { data } = await supabase.from("localities").select("id, name, voivodeship").eq("name", name.replace(/-/g, " ")).limit(1);
+  if (data && data.length) return data[0];
+  const { data: all } = await supabase.from("localities").select("id, name, voivodeship").limit(60000);
+  return (all ?? []).find((c) => slugify(c.name) === name) ?? null;
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
