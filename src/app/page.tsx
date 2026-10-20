@@ -13,6 +13,7 @@ import { ui } from "@/lib/ui";
 import { CategoryTiles, type Tile } from "@/components/category-tiles";
 import { LocalityNav } from "@/components/locality-picker";
 import { ListingThumb } from "@/components/listing-thumb";
+import { FavoriteButton } from "@/components/favorite-button";
 
 type SearchParams = Promise<{ q?: string; f?: string; sort?: string; lat?: string; lng?: string; r?: string }>;
 
@@ -71,6 +72,9 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   const near = parseNear(sp.lat, sp.lng, sp.r);
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const now = new Date().toISOString();
 
   const tiles: Tile[] = [
@@ -224,6 +228,12 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
     }))
     .filter((c) => !near || (c.distance !== null && c.distance <= near.radius));
 
+  const savedSet = new Set<string>();
+  if (user) {
+    const { data: favRows } = await supabase.from("favorites").select("listing_kind, listing_id").eq("user_id", user.id);
+    for (const row of favRows ?? []) savedSet.add(`${row.listing_kind}-${row.listing_id}`);
+  }
+
   const isFeatured = (c: Card) => !!c.featured_until && c.featured_until > now;
 
   withDistance.sort((a, b) => {
@@ -336,7 +346,14 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
                 <div className="flex flex-col gap-3 sm:flex-row">
                   {c.photo && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={c.photo} alt={c.title} loading="lazy" className="aspect-[4/3] w-full rounded-lg object-cover sm:aspect-square sm:w-28 sm:shrink-0" />
+                    <div className="relative">
+                      <img src={c.photo} alt={c.title} loading="lazy" className="aspect-[4/3] w-full rounded-lg object-cover sm:aspect-square sm:w-28 sm:shrink-0" />
+                      {c.kind !== "job" && (
+                        <div className="absolute right-2 top-2 rounded-full bg-white/95 shadow-md">
+                          <FavoriteButton kind={c.kind} listingId={c.id} initial={savedSet.has(`${c.kind}-${c.id}`)} lang={lang} path="/" loggedIn={!!user} compact />
+                        </div>
+                      )}
+                    </div>
                   )}
                   <div className="min-w-0 flex-1">
                     <Link

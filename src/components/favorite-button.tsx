@@ -17,6 +17,7 @@ export function FavoriteButton({
   lang,
   path,
   loggedIn,
+  compact = false,
 }: {
   kind: "job" | "sale" | "rent";
   listingId: string;
@@ -24,6 +25,7 @@ export function FavoriteButton({
   lang: Lang;
   path: string;
   loggedIn: boolean;
+  compact?: boolean;
 }) {
   const t = LABEL[lang];
   const [saved, setOptimistic] = useOptimistic(initial);
@@ -48,14 +50,14 @@ export function FavoriteButton({
           await toggleFavorite(kind, listingId, path);
         })
       }
-      className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition active:scale-95 ${
+      className={`${compact ? "flex h-11 w-11 items-center justify-center text-2xl" : "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold"} transition active:scale-90 ${
         saved
           ? "border-rose-300 bg-rose-50 text-rose-700 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-300"
           : "border-slate-300 bg-white text-slate-700 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200"
       }`}
     >
-      <span aria-hidden="true" className="text-base">{saved ? "♥" : "♡"}</span>
-      {saved ? t.saved : t.save}
+      <span aria-hidden="true" className={compact ? "" : "text-base"}>{saved ? "♥" : "♡"}</span>
+      {!compact && (saved ? t.saved : t.save)}
     </button>
   );
 }
