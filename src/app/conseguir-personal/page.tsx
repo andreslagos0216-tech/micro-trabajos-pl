@@ -56,6 +56,7 @@ const T: Record<Lang, Record<string, string>> = {
     done: "Gracias. Te escribiremos por WhatsApp.",
     errData: "Revisa el nombre, el WhatsApp y el tipo de trabajo.",
     errSave: "No se pudo enviar la solicitud. Inténtalo de nuevo.",
+    faqLink: "¿Cómo funciona? Preguntas frecuentes",
   },
   en: {
     title: "Need staff?",
@@ -80,6 +81,7 @@ const T: Record<Lang, Record<string, string>> = {
     done: "Thank you. We'll message you on WhatsApp.",
     errData: "Please check your name, WhatsApp and type of work.",
     errSave: "The request could not be sent. Please try again.",
+    faqLink: "How does it work? Frequently asked questions",
   },
 };
 
@@ -179,6 +181,10 @@ async function StaffContent({ searchParams }: { searchParams: SearchParams }) {
 
         <button type="submit" className={`${ui.button} w-full`}>{t.send}</button>
       </form>
+
+      <p className="mt-4 text-center text-sm">
+        <Link href="/preguntas" className={ui.link}>{t.faqLink}</Link>
+      </p>
     </>
   );
 }
