@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { escapeHtml, notifyAdmin } from "@/lib/notify";
 
 const PAY = ["hour", "day", "project", "agreed"];
 const LANGS = ["pl", "es", "en"];
@@ -40,6 +41,18 @@ export async function sendStaffRequest(formData: FormData) {
     locality_id: localityId,
   });
   if (error) redirect("/conseguir-personal?error=guardar");
+
+  await notifyAdmin(
+    `Nueva solicitud de personal: ${workType}`,
+    `<h2>Nueva solicitud de personal</h2>
+     <p><strong>Trabajo:</strong> ${escapeHtml(workType)}</p>
+     <p><strong>Personas:</strong> ${peopleCount}</p>
+     <p><strong>Pago:</strong> ${escapeHtml(payType)}${payRaw ? ` · ${escapeHtml(payRaw)} zł` : ""}</p>
+     <p><strong>Cuándo:</strong> ${escapeHtml(whenNeeded || "—")}</p>
+     <p><strong>Detalles:</strong> ${escapeHtml(description || "—")}</p>
+     <p><strong>Contacto:</strong> ${escapeHtml(requesterName)} · WhatsApp ${escapeHtml(whatsapp)}</p>
+     <p><a href="https://taskgo.pl/admin">Ver en el panel de administración</a></p>`
+  );
 
   redirect("/conseguir-personal?ok=1");
 }
