@@ -347,7 +347,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
                   {c.photo && (
                     // eslint-disable-next-line @next/next/no-img-element
                     <div className="relative">
-                      <img src={c.photo} alt={c.title} loading="lazy" className="aspect-[4/3] w-full rounded-lg object-cover sm:aspect-square sm:w-28 sm:shrink-0" />
+                      <img src={c.photo} alt={c.title} loading="lazy" className="aspect-[4/3] w-full rounded-lg object-cover sm:w-28 sm:shrink-0" />
                       {c.kind !== "job" && (
                         <div className="absolute right-2 top-2 rounded-full bg-white/95 shadow-md">
                           <FavoriteButton kind={c.kind} listingId={c.id} initial={savedSet.has(`${c.kind}-${c.id}`)} lang={lang} path="/" loggedIn={!!user} compact />
