@@ -62,7 +62,7 @@ async function Conversation({ params }: { params: Params }) {
 
   const otherId = (isOwner ? conv.buyer_id : conv.owner_id) ?? "";
   const { data: other } = await supabase.from("profiles").select("full_name").eq("id", otherId).single();
-  const otherName = other?.full_name || (lang === "pl" ? "Użytkownik" : lang === "en" ? "User" : "Usuario");
+  const otherName = isSystem ? "TaskGo" : other?.full_name || (lang === "pl" ? "Użytkownik" : lang === "en" ? "User" : "Usuario");
 
   const sendAction = sendMessage.bind(null, id);
   const back = lang === "pl" ? "Wróć do wiadomości" : lang === "en" ? "Back to messages" : "Volver a mensajes";
@@ -73,7 +73,7 @@ async function Conversation({ params }: { params: Params }) {
     <>
       <Link href="/mensajes" className={`${ui.link} mb-4 inline-block`}>← {back}</Link>
       <header className={`${ui.card} mb-4 flex items-center gap-3`}>
-        <Avatar name={otherName} size={44} />
+        {isSystem ? <span className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-700 text-lg font-bold text-white">T</span> : <Avatar name={otherName} size={44} />}
         <div className="min-w-0 flex-1">
           <Link href={`/usuario/${otherId}`} className="block truncate text-sm font-semibold text-slate-900 hover:underline dark:text-slate-50">
             {otherName}
