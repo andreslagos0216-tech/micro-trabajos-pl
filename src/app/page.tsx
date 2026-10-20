@@ -12,7 +12,7 @@ import { listHref } from "@/lib/url";
 import { ui } from "@/lib/ui";
 import { CategoryTiles, type Tile } from "@/components/category-tiles";
 import { LocalityNav } from "@/components/locality-picker";
-import { ListingThumb } from "@/components/listing-thumb";
+import { ListingCard } from "@/components/listing-card";
 import { FavoriteButton } from "@/components/favorite-button";
 
 type SearchParams = Promise<{ q?: string; f?: string; sort?: string; lat?: string; lng?: string; r?: string }>;
@@ -336,45 +336,28 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
         {visible.length === 0 ? (
           <p className={ui.emptyBox}>{h.emptyFeed}</p>
         ) : (
-          <ul className="grid gap-3 sm:grid-cols-2">
-            {visible.map((c) => (
-              <li key={`${c.kind}-${c.id}`} className={isFeatured(c) ? ui.cardFeatured : ui.card}>
-                <div className="mb-2 flex flex-wrap gap-2">
-                  <span className={ui.badgeNeutral}>{c.badge}</span>
-                  {isFeatured(c) && <span className={ui.badge}>{t.badgeFeatured}</span>}
-                </div>
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  {c.photo && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <div className="relative">
-                      <img src={c.photo} alt={c.title} loading="lazy" className="aspect-[4/3] w-full rounded-lg object-cover sm:w-28 sm:shrink-0" />
-                      {c.kind !== "job" && (
-                        <div className="absolute right-2 top-2 rounded-full bg-white/95 shadow-md">
-                          <FavoriteButton kind={c.kind} listingId={c.id} initial={savedSet.has(`${c.kind}-${c.id}`)} lang={lang} path="/" loggedIn={!!user} compact />
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <Link
-                      href={c.href}
-                      className="block truncate text-base font-semibold text-slate-900 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded dark:text-slate-50"
-                    >
-                      {c.title}
-                    </Link>
-                    <p className="mt-1 text-sm font-bold text-slate-900 dark:text-slate-50">
-                      {c.agreed || c.price == null ? h.agreed : `${c.price} zł${c.unit ? ` / ${c.unit}` : ""}`}
-                      {c.kind === "sale" && c.agreed && c.price != null && <> · {h.negotiable}</>}
-                    </p>
-                    <p className={`mt-0.5 text-xs ${ui.muted}`}>
-                      {c.city}
-                      {c.distance != null && <> · {formatKm(c.distance)}</>}
-                    </p>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {visible.map((c) => (
+            <ListingCard
+              key={`${c.kind}-${c.id}`}
+              id={c.id}
+              kind={c.kind}
+              title={c.title}
+              href={c.href}
+              badge={c.badge}
+              photo={c.photo}
+              city={c.city ?? ""}
+              priceText={c.agreed || c.price == null ? h.agreed : `${c.price} zł${c.unit ? ` / ${c.unit}` : ""}`}
+              distanceText={c.distance != null ? ` · ${formatKm(c.distance)}` : ""}
+              featured={isFeatured(c)}
+              featuredText={t.badgeFeatured}
+              saved={savedSet.has(`${c.kind}-${c.id}`)}
+              loggedIn={!!user}
+              lang={lang}
+              path="/"
+            />
+          ))}
+        </ul>
         )}
       </section>
 
