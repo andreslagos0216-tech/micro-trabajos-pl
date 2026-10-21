@@ -1,5 +1,7 @@
 "use server";
 
+import { prefillTranslations } from "@/lib/prefill-translations";
+
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -49,6 +51,11 @@ export async function updateListing(section: string, id: string, formData: FormD
       .eq("author_id", user.id);
     if (error) throw new Error(error.message);
   }
+
+  const kind = section === "sale" ? "sale" : "rent";
+  const { data: current } = await createClient()
+    .then((s) => s.from(kind === "sale" ? "sale_listings" : "rental_listings").select("original_lang").eq("id", id).single());
+  await prefillTranslations(kind, id, current?.original_lang ?? "es", title, description);
 
   redirect(`/listados/${section}/${id}`);
 }
