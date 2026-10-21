@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { FavoriteButton } from "@/components/favorite-button";
 import type { Lang } from "@/lib/i18n";
@@ -27,8 +28,7 @@ export function ListingCard(p: Props) {
     <li className="tg-card relative flex flex-col overflow-hidden">
       <div className="relative m-2 aspect-[4/3] overflow-hidden rounded-[16px] bg-slate-100 dark:bg-slate-800">
         {p.photo ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={p.photo} alt={`${p.badge}: ${p.title}`} loading="lazy" className="h-full w-full object-cover" />
+          <Image src={p.photo} alt={`${p.badge}: ${p.title}`} fill sizes="(max-width: 640px) 50vw, 300px" className="object-cover" />
         ) : (
           <div aria-hidden="true" className="flex h-full w-full items-center justify-center text-4xl">
             {ICON[p.kind]}
