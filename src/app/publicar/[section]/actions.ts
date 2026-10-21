@@ -1,5 +1,7 @@
 "use server";
 
+import { prefillTranslations } from "@/lib/prefill-translations";
+
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { reviewStatus } from "@/lib/moderation";
@@ -113,6 +115,7 @@ export async function createListing(formData: FormData) {
       if (photoError) throw new Error(photoError.message);
     }
 
+    await prefillTranslations("sale", row.id, originalLang, title, description);
     redirect(`/listados/sale/${row.id}`);
   }
 
@@ -145,5 +148,6 @@ export async function createListing(formData: FormData) {
     if (photoError) throw new Error(photoError.message);
   }
 
+  await prefillTranslations("rent", row.id, originalLang, title, description);
   redirect(`/listados/rent/${row.id}`);
 }
