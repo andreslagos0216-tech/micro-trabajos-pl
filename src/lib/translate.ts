@@ -50,7 +50,7 @@ export async function localizeMany<T extends TextRow>(rows: T[], target: Lang) {
 }
 
 // Traduce respetando los saltos de línea
-async function translateField(text: string, source: Lang, target: Lang): Promise<string> {
+export async function translateField(text: string, source: Lang, target: Lang): Promise<string> {
   if (source === target || !text.trim()) return text;
 
   // Una sola llamada por campo; los saltos de línea se conservan marcándolos antes
