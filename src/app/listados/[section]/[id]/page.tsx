@@ -267,9 +267,7 @@ async function ListingDetail({ params, searchParams }: { params: Params; searchP
             </div>
 
             {!isFeatured && item.status === "active" && (
-              <form action={startListingFeatured.bind(null, section, id)}>
-                <button type="submit" className={ui.button}>{g.featureButton}</button>
-              </form>
+              <div className="inline-flex rounded-md bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-500 dark:bg-slate-700 dark:text-slate-300">Destacar: próximamente</div>
             )}
 
             <form action={deleteListing.bind(null, section, id)} className="pt-2">
