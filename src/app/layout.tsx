@@ -35,7 +35,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <ConfirmGate />
         <MobileNav />
         </Suspense>
-        <div className="flex-1">{children}</div>
+        <div className="flex-1 min-h-[70vh]">{children}</div>
         <Suspense fallback={null}>
           <SiteFooter />
         </Suspense>
