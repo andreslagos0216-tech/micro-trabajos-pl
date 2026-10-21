@@ -1,5 +1,7 @@
 "use server";
 
+import { prefillTranslations } from "@/lib/prefill-translations";
+
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { reviewStatus } from "@/lib/moderation";
@@ -85,6 +87,8 @@ export async function createJob(formData: FormData) {
     .single();
 
   if (error) throw new Error(error.message);
+
+  await prefillTranslations("job", job.id, originalLang, title, description);
 
   redirect(`/jobs/${job.id}`);
 }
