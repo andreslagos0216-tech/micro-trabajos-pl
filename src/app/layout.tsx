@@ -30,7 +30,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="pl">
       <body className="flex min-h-screen flex-col pb-24 md:pb-0">
-        <Suspense fallback={<div className="h-16 border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900" />}>
+        <Suspense fallback={<div className="min-h-[140px] border-b border-slate-200 bg-white md:min-h-[64px] dark:border-slate-800 dark:bg-slate-900" />}>
           <SiteHeader />
         <ConfirmGate />
         <MobileNav />
