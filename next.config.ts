@@ -19,6 +19,13 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "fmtgpaditeikkqnanzad.supabase.co", pathname: "/storage/v1/object/public/**" },
     ],
   },
+  async redirects() {
+    return [
+      { source: "/listados/:path*", destination: "/", permanent: false },
+      { source: "/mapa", destination: "/", permanent: false },
+      { source: "/conseguir-personal", destination: "/", permanent: false },
+    ];
+  },
   async headers() {
     return [
       {

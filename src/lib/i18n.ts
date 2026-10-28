@@ -209,5 +209,5 @@ export const dict: Record<Lang, Dict> = { pl, es, en };
 
 export async function getLang(): Promise<Lang> {
   const value = (await cookies()).get("lang")?.value;
-  return value === "es" || value === "en" ? value : "pl";
+  return value === "es" ? "es" : "pl";
 }

@@ -78,19 +78,15 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   } = await supabase.auth.getUser();
   const now = new Date().toISOString();
 
-  const tiles: Tile[] = [
+    const tiles: Tile[] = [
     { href: "/?f=job", label: h.tiles.job.label, icon: "💼", keywords: h.tiles.job.keywords },
     { href: "/?f=service", label: h.tiles.service.label, icon: "🛠️", keywords: h.tiles.service.keywords },
     { href: "/?f=candidate", label: h.tiles.candidate.label, icon: "🔍", keywords: h.tiles.candidate.keywords },
-    { href: "/listados/sale", label: h.tiles.sale.label, icon: "🛒", keywords: h.tiles.sale.keywords },
-    { href: "/listados/rent", label: h.tiles.rent.label, icon: "🏠", keywords: h.tiles.rent.keywords },
-    { href: "/mapa", label: h.tiles.map.label, icon: "🗺️", keywords: h.tiles.map.keywords },
-    { href: "/conseguir-personal", label: (lang === "pl" ? "Potrzebuję ludzi" : lang === "en" ? "Need staff" : "Necesito personal"), icon: "🤝", keywords: "personal ayuda trabajadores limpieza nieve ayudante" },
   ];
 
   const wantJobs = filter === "all" || filter === "job" || filter === "service" || filter === "candidate" || filter === "hourly";
-  const wantSale = filter === "all" || filter === "sale";
-  const wantRent = filter === "all" || filter === "rent";
+  const wantSale = false;
+  const wantRent = false;
 
   const jobKind: Kind[] | null =
     filter === "job" ? ["job"] : filter === "service" ? ["service"] : filter === "candidate" ? ["candidate"] : null;
@@ -276,7 +272,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
       <CategoryTiles tiles={tiles} />
 
       <div className="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
-        {FILTERS.map((value) => (
+        {FILTERS.filter((value) => value !== "sale" && value !== "rent").map((value) => (
           <Link
             key={value}
             href={linkFor({ f: value === "all" ? undefined : value, sort: currentSortValue })}
