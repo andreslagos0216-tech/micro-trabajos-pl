@@ -74,3 +74,4 @@ a:active, button:active {
 /* Tema claro para el portal de empleo: fondo claro y tarjetas blancas */
 html, body { background: #f2f4f5; color: #0f172a; color-scheme: light; }
 .dark .tg-card { background: #ffffff; }
+@custom-variant dark (&:where(.dark, .dark *));
