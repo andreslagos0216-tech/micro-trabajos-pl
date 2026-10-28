@@ -15,6 +15,7 @@ import { listingMetadata } from "@/lib/seo";
 import { ReportForm } from "@/components/report-form";
 import { JobContact } from "@/components/job-contact";
 import { FavoriteButton } from "@/components/favorite-button";
+import { CompanyLogo } from "@/components/company-logo";
 import { MessageButton } from "@/components/message-button";
 import { applyToJob } from "./postular/actions";
 import { startFeaturedCheckout } from "./actions";
@@ -62,6 +63,7 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
     lang as Lang
   );
 
+  const { data: authorProfile } = await supabase.from("profiles").select("full_name, logo_url").eq("id", job.author_id).single();
   const isOwner = user?.id === job.author_id;
   const isFeatured = !!job.featured_until && new Date(job.featured_until) > new Date();
   const kind = job.kind as Kind;
@@ -91,7 +93,10 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
         </div>
 
         <div>
+          <div className="flex items-center gap-3">
+          <CompanyLogo url={authorProfile?.logo_url ?? null} name={authorProfile?.full_name ?? null} size={48} />
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">{local.title}</h1>
+        </div>
           <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
             <div>
               <dt className={ui.muted}>{t.cityLabel}</dt>
