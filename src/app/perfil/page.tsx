@@ -9,6 +9,8 @@ import { perfilText } from "@/lib/perfil-text";
 import { ui } from "@/lib/ui";
 import { LocalityPicker } from "@/components/locality-picker";
 import { updateProfile, signOut } from "./actions";
+import { uploadLogo } from "./logo-actions";
+import { CompanyLogo } from "@/components/company-logo";
 
 type SearchParams = Promise<{ saved?: string }>;
 
@@ -40,7 +42,7 @@ async function ProfileContent({ searchParams }: { searchParams: SearchParams }) 
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, bio, languages, is_verified, created_at, show_phone, localities(name)")
+    .select("full_name, bio, languages, is_verified, created_at, show_phone, logo_url, localities(name)")
     .eq("id", user.id)
     .single();
 
@@ -91,6 +93,15 @@ async function ProfileContent({ searchParams }: { searchParams: SearchParams }) 
         </p>
       )}
 
+      <section className={`${ui.card} mb-6 flex items-center gap-4`}>
+        <CompanyLogo url={profile?.logo_url ?? null} name={profile?.full_name ?? null} size={64} />
+        <form action={uploadLogo} className="flex-1 space-y-2">
+          <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">Logo de la empresa o agencia</p>
+          <p className={`text-xs ${ui.muted}`}>JPG, PNG o WebP, máximo 2 MB. Aparece en tus ofertas y en las postulaciones.</p>
+          <input type="file" name="logo" accept="image/jpeg,image/png,image/webp" className="text-sm" />
+          <button type="submit" className={ui.buttonSecondary}>Subir logo</button>
+        </form>
+      </section>
       <section className={`${ui.card} mb-6 space-y-2`}>
         <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">{profile?.full_name || user.email}</p>
         <p className={`text-sm ${ui.muted}`}>{t.email}: {user.email}</p>
