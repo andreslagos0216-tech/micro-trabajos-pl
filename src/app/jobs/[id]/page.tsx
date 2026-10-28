@@ -16,6 +16,7 @@ import { ReportForm } from "@/components/report-form";
 import { JobContact } from "@/components/job-contact";
 import { FavoriteButton } from "@/components/favorite-button";
 import { MessageButton } from "@/components/message-button";
+import { applyToJob } from "./postular/actions";
 import { startFeaturedCheckout } from "./actions";
 import { deleteJob } from "./owner-actions";
 import { ownerText } from "@/lib/owner-i18n";
@@ -161,6 +162,22 @@ async function JobDetail({ params, searchParams }: { params: Params; searchParam
       </article>
 
       <div className="mt-6">
+        {isOwner ? (
+          <Link href={`/jobs/${job.id}/postulaciones`} className={ui.buttonSecondary}>
+            Ver postulaciones
+          </Link>
+        ) : user && user.email_confirmed_at ? (
+          <form action={applyToJob.bind(null, job.id)} className={`${ui.card} space-y-3`}>
+            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Postular a esta oferta</p>
+            <label htmlFor="apply_msg" className="sr-only">Mensaje</label>
+            <textarea id="apply_msg" name="message" rows={3} maxLength={1000} placeholder="Mensaje opcional para la empresa" className={ui.input} />
+            <button type="submit" className={ui.button}>Postular</button>
+          </form>
+        ) : (
+          <p className={`text-sm ${ui.muted}`}>
+            <Link href="/login" className={ui.link}>Inicia sesión y confirma tu correo</Link> para postular.
+          </p>
+        )}
         <FavoriteButton kind="job" listingId={job.id} initial={await isJobSaved(supabase, user?.id, job.id)} lang={lang} path={`/jobs/${job.id}`} loggedIn={!!user} />
         <MessageButton kind="job" listingId={job.id} lang={lang} isOwner={user?.id === job.author_id} loggedIn={!!user} />
         <JobContact
