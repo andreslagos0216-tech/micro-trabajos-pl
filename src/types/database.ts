@@ -633,33 +633,45 @@ export type Database = {
       }
       profiles: {
         Row: {
+          availability: string | null
           bio: string | null
           city_id: number | null
           created_at: string
+          experience: string | null
           full_name: string | null
+          headline: string | null
           id: string
+          is_candidate: boolean
           is_verified: boolean
           languages: string[]
           locality_id: number | null
           show_phone: boolean
         }
         Insert: {
+          availability?: string | null
           bio?: string | null
           city_id?: number | null
           created_at?: string
+          experience?: string | null
           full_name?: string | null
+          headline?: string | null
           id: string
+          is_candidate?: boolean
           is_verified?: boolean
           languages?: string[]
           locality_id?: number | null
           show_phone?: boolean
         }
         Update: {
+          availability?: string | null
           bio?: string | null
           city_id?: number | null
           created_at?: string
+          experience?: string | null
           full_name?: string | null
+          headline?: string | null
           id?: string
+          is_candidate?: boolean
           is_verified?: boolean
           languages?: string[]
           locality_id?: number | null
