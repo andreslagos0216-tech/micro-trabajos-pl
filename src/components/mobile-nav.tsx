@@ -2,10 +2,10 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getLang, type Lang } from "@/lib/i18n";
 
-const LABELS: Record<Lang, { home: string; staff: string; publish: string; messages: string; account: string }> = {
-  pl: { home: "Start", staff: "Personel", publish: "Dodaj", messages: "Wiad.", account: "Konto" },
-  es: { home: "Inicio", staff: "Personal", publish: "Publicar", messages: "Mensajes", account: "Cuenta" },
-  en: { home: "Home", staff: "Staff", publish: "Post", messages: "Messages", account: "Account" },
+const LABELS: Record<Lang, { home: string; jobs: string; publish: string; messages: string; account: string }> = {
+  pl: { home: "Start", jobs: "Oferty", publish: "Dodaj", messages: "Wiad.", account: "Konto" },
+  es: { home: "Inicio", jobs: "Ofertas", publish: "Publicar", messages: "Mensajes", account: "Cuenta" },
+  en: { home: "Home", jobs: "Jobs", publish: "Post", messages: "Messages", account: "Account" },
 };
 
 export async function MobileNav() {
@@ -18,7 +18,7 @@ export async function MobileNav() {
 
   const items = [
     { href: "/", label: t.home, icon: "🏠" },
-    { href: "/conseguir-personal", label: t.staff, icon: "🤝" },
+    { href: "/", label: t.jobs, icon: "💼" },
     { href: "/publicar", label: t.publish, icon: "+", primary: true },
     { href: "/mensajes", label: t.messages, icon: "💬" },
     { href: user ? "/perfil" : "/login", label: t.account, icon: "👤" },
