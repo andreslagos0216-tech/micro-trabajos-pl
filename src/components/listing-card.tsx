@@ -30,7 +30,7 @@ export function ListingCard(p: Props) {
         {p.photo ? (
           <Image src={p.photo} alt={`${p.badge}: ${p.title}`} fill sizes="(max-width: 640px) 50vw, 300px" className="object-cover" />
         ) : (
-          <div aria-hidden="true" className="flex h-full w-full items-center justify-center text-4xl">
+          <div aria-hidden="true" className={`flex h-full w-full items-center justify-center text-4xl ${p.kind === "job" ? "bg-blue-50" : "bg-emerald-50"}`}>
             {ICON[p.kind]}
           </div>
         )}
