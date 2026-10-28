@@ -12,7 +12,7 @@ export async function moderateListing(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user || !process.env.ADMIN_EMAIL || user.email !== process.env.ADMIN_EMAIL) redirect("/");
+  if (!user || !user.email_confirmed_at || !process.env.ADMIN_EMAIL || user.email !== process.env.ADMIN_EMAIL) redirect("/");
 
   const table = String(formData.get("table")) as (typeof TABLES)[number];
   const id = String(formData.get("id"));

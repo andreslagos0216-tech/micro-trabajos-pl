@@ -36,7 +36,7 @@ async function AdminContent() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user || !process.env.ADMIN_EMAIL || user.email !== process.env.ADMIN_EMAIL) redirect("/");
+  if (!user || !user.email_confirmed_at || !process.env.ADMIN_EMAIL || user.email !== process.env.ADMIN_EMAIL) redirect("/");
 
   const admin = createAdminClient();
   const cols = "id, title, description, review_note, created_at";
