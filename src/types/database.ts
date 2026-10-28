@@ -645,6 +645,7 @@ export type Database = {
           is_verified: boolean
           languages: string[]
           locality_id: number | null
+          logo_url: string | null
           show_phone: boolean
         }
         Insert: {
@@ -660,6 +661,7 @@ export type Database = {
           is_verified?: boolean
           languages?: string[]
           locality_id?: number | null
+          logo_url?: string | null
           show_phone?: boolean
         }
         Update: {
@@ -675,6 +677,7 @@ export type Database = {
           is_verified?: boolean
           languages?: string[]
           locality_id?: number | null
+          logo_url?: string | null
           show_phone?: boolean
         }
         Relationships: [
