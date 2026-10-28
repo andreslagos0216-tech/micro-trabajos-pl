@@ -25,7 +25,7 @@ const ICON: Record<Props["kind"], string> = { job: "💼", sale: "🛒", rent: "
 
 export function ListingCard(p: Props) {
   return (
-    <li className="tg-card relative flex flex-col overflow-hidden">
+    <li className="relative flex flex-col overflow-hidden rounded-[20px] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
       <div className="relative m-2 aspect-[4/3] overflow-hidden rounded-[16px] bg-slate-100 dark:bg-slate-800">
         {p.photo ? (
           <Image src={p.photo} alt={`${p.badge}: ${p.title}`} fill sizes="(max-width: 640px) 50vw, 300px" className="object-cover" />

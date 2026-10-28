@@ -71,3 +71,6 @@ a:active, button:active {
 @media (max-width: 767px) {
   main { padding-bottom: 96px; }
 }
+/* Tema claro para el portal de empleo: fondo claro y tarjetas blancas */
+html, body { background: #f2f4f5; color: #0f172a; color-scheme: light; }
+.dark .tg-card { background: #ffffff; }
